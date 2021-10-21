@@ -34,9 +34,9 @@ class EmbeddedCode {
         // https://www.facebook.com/ facebookapp              / posts                                / 10160138384851729
         // https://www.facebook.com/ 563994370665617          / videos                               / 397668314698045
         // https://www.facebook.com/ DonDonDonkiTW            / photos           /a.3857266087638216 / 3902755526422605
-        // https://www.facebook.com/ permalink.php?story_fbid = 1777370489206638 &id                 = 1765245810419106
+        // https://www.facebook.com/ permalink.php?story_fbid = 229021587215556  &id                 = 11239244970
         return RegExp(
-          r'src="https:\/\/www\.facebook\.com\/plugins\/(?:post|video)\.php\?(?:.*)href=(https?(?:%3A%2F%2F|\:\/\/)www\.facebook\.com(?:%2F|\/)(?:permalink\.php(?:%3F|\?)story_fbid|[a-zA-Z0-9.]+)(?:%2F|\/|=|%3D)(?:posts|videos|photos|[0-9]+)(?:%2F[a-z].[0-9]+|\/[a-z].[0-9]+|\&id|%26id)?(?:%2F|\/|=|%3D)[0-9]+)(?:%2F?|\\?)\&',
+          r'src="https:\/\/www\.facebook\.com\/plugins\/(?:post|video)\.php\?(?:.*)href=(https?(?:%3A%2F%2F|\:\/\/)www\.facebook\.com(?:%2F|\/)(?:permalink\.php(?:%3F|\?)story_fbid|[a-zA-Z0-9.]+)(?:%2F|\/|=|%3D)(?:posts|videos|photos|[0-9]+)(?:%2F[a-z].[0-9]+|\/[a-z].[0-9]+|\&id|%26id)?(?:%2F|\/|=|%3D)[0-9]+)',
           caseSensitive: false,
         );
       case EmbeddedCodeType.instagram:
