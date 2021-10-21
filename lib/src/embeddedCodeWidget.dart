@@ -28,8 +28,8 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
   late final EmbeddedCodeType? _embeddedCodeType;
   late WebViewController _webViewController;
 
-  late double? _webViewWidth;
-  late double? _webViewHeight;
+  double? _webViewWidth;
+  double? _webViewHeight;
   late double _webViewAspectRatio;
   late double _webViewBottomPadding;
 
