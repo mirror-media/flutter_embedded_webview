@@ -1,0 +1,1 @@
+library flutter_embedded_webview;
