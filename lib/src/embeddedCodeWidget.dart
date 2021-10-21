@@ -230,8 +230,8 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
               _webViewAspectRatio, _webViewBottomPadding
             ) && 
             Platform.isAndroid)
-          Align(
-            alignment: Alignment.bottomCenter,
+          Positioned(
+            bottom: 0.0,
             child: _buildWatchingMoreWidget(width),
           ),
         // cover a launching url widget over the iframe 
@@ -261,6 +261,7 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
 
   Widget _buildWatchingMoreWidget(double width) {
     return Container(
+      width: width,
       height: width / 16 * 9 / 3,
       color: Colors.black.withOpacity(0.6),
       child: const Padding(

@@ -123,8 +123,8 @@ class _FbEmbeddedCodeWidgetState extends State<FbEmbeddedCodeWidget> {
         // display watching more widget when meeting some conditions.
         if(_isHigherThanScreenHeight(width, height, _ratio) && 
             Platform.isAndroid)
-          Align(
-            alignment: Alignment.bottomCenter,
+          Positioned(
+            bottom: 0.0,
             child: _buildWatchingMoreWidget(width),
           ),
         // cover a launching url widget over the iframe 
@@ -152,6 +152,7 @@ class _FbEmbeddedCodeWidgetState extends State<FbEmbeddedCodeWidget> {
   
   Widget _buildWatchingMoreWidget(double width) {
     return Container(
+      width: width,
       height: width / 16 * 9 / 3,
       color: Colors.black.withOpacity(0.6),
       child: const Padding(
