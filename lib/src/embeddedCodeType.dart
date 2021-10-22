@@ -4,7 +4,8 @@ enum EmbeddedCodeType {
   twitter,
   tiktok,
   dcard,
-  googleMap
+  googleMap,
+  youtube,
 }
 
 class EmbeddedCode {
@@ -21,6 +22,8 @@ class EmbeddedCode {
       return EmbeddedCodeType.dcard;
     } else if(embeddedCode.contains('www.google.com/maps/embed')) {
       return EmbeddedCodeType.googleMap;
+    } else if(embeddedCode.contains('www.youtube.com/embed')) {
+      return EmbeddedCodeType.youtube;
     }
 
     return null;
@@ -60,6 +63,8 @@ class EmbeddedCode {
           caseSensitive: false,
         );
       case EmbeddedCodeType.googleMap:
+        return null;
+      case EmbeddedCodeType.youtube:
         return null;
       default: 
         return null;
