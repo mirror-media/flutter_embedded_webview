@@ -199,6 +199,9 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
                   _webViewAspectRatio = 16/9;
                 }
                 _webViewBottomPadding = 0;
+              } else if(_embeddedCodeType == EmbeddedCodeType.dcard) {
+                // Set dcard to a fixed ratio
+                _webViewAspectRatio = 1/1.8;
               } else {
                 _webViewWidth = double.tryParse(
                   await _webViewController
@@ -211,18 +214,12 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
               }
               // reset the webview size
               if(mounted && !_screenIsReseted) {
-                if(_embeddedCodeType == EmbeddedCodeType.facebook) {
-                  setState(() {
-                    _screenIsReseted = true;
-                  });
-                } else {
-                  setState(() {
-                    _screenIsReseted = true;
-                    if(_webViewWidth != null && _webViewHeight != null) {
-                      _webViewAspectRatio = _webViewWidth!/_webViewHeight!;
-                    }
-                  });
-                }
+                setState(() {
+                  _screenIsReseted = true;
+                  if(_webViewWidth != null && _webViewHeight != null) {
+                    _webViewAspectRatio = _webViewWidth!/_webViewHeight!;
+                  }
+                });
               }
             },
           ),
