@@ -147,7 +147,10 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
     if(_embeddedCodeType == EmbeddedCodeType.facebook && Platform.isAndroid) {
       return FbEmbeddedCodeWidget(embeddedCode: widget.embeddedCode);
     } else if(_embeddedCodeType == EmbeddedCodeType.youtube) {
-      return YtEmbeddedCodeWidget(embeddedCode: widget.embeddedCode);
+      return YtEmbeddedCodeWidget(
+        embeddedCode: widget.embeddedCode,
+        aspectRatio: widget.aspectRatio,
+      );
     }
 
     return Stack(

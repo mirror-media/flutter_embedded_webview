@@ -3,9 +3,11 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 class YtEmbeddedCodeWidget extends StatefulWidget {
   final String embeddedCode;
+  final double? aspectRatio;
   const YtEmbeddedCodeWidget({
     Key? key,
     required this.embeddedCode,
+    this.aspectRatio,
   }) : super(key: key);
 
   @override
@@ -13,16 +15,40 @@ class YtEmbeddedCodeWidget extends StatefulWidget {
 }
 
 class _YtEmbeddedCodeWidgetState extends State<YtEmbeddedCodeWidget> {
-  double _ratio = 16/9;
-  late String _initialUrl;
+  late double _aspectRatio;
+  late String? _initialUrl;
 
-  Future<bool> _setWebviewInitialUrlAndRatio() async{
+  @override
+  void initState() {
+    // set initial url
+    _initialUrl = _getWebviewInitialUrl();
+
+    // set aspect ratio
+    if(widget.aspectRatio == null) {
+      _aspectRatio = _getWebviewAspectRatio();
+    } else {
+      _aspectRatio = widget.aspectRatio!;
+    }
+    
+    super.initState();
+  }
+
+  String? _getWebviewInitialUrl(){
     try {
       RegExp initialUrlRegExp = RegExp(
         r'src="(https:\/\/www\.youtube\.com\/embed\/\w+)"',
         caseSensitive: false,
       );
-      _initialUrl = initialUrlRegExp.firstMatch(widget.embeddedCode)!.group(1)!;
+      String initialUrl = initialUrlRegExp.firstMatch(widget.embeddedCode)!.group(1)!;
+
+      return initialUrl;
+    } catch(e) {
+      return null;
+    }
+  }
+
+  double _getWebviewAspectRatio() {
+    try {
       RegExp widthRegExp = RegExp(
         r'width="(.[0-9]*)"',
         caseSensitive: false,
@@ -33,43 +59,29 @@ class _YtEmbeddedCodeWidgetState extends State<YtEmbeddedCodeWidget> {
       );
       double w = double.parse(widthRegExp.firstMatch(widget.embeddedCode)!.group(1)!);
       double h = double.parse(heightRegExp.firstMatch(widget.embeddedCode)!.group(1)!);
-      _ratio = w/h;
-      return true;
+      return w/h;
     } catch(e) {
-      return false;
+      return 16/9;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: _setWebviewInitialUrlAndRatio(),
-      builder: (context, snapshot) {
-        return LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              if(snapshot.data!) {
-                return SizedBox(
-                  width: constraints.maxWidth,
-                  height: constraints.maxWidth/_ratio,
-                  child: WebView(
-                    initialUrl: _initialUrl,
-                    javascriptMode: JavascriptMode.unrestricted,
-                    onPageFinished: (e) {},
-                  ),
-                );
-              }
-              
-              return Container();
-            }
+    if(_initialUrl == null) {
+      return Container();
+    }
 
-            return SizedBox(
-              width: constraints.maxWidth,
-              height: constraints.maxWidth/_ratio,
-              child: const Center(child: CircularProgressIndicator())
-            );
-          }
-        );
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+      return SizedBox(
+        width: constraints.maxWidth,
+        height: constraints.maxWidth/_aspectRatio,
+        child: WebView(
+          initialUrl: _initialUrl,
+          javascriptMode: JavascriptMode.unrestricted,
+          onPageFinished: (e) {},
+        ),
+      );
       }
     );
   }
