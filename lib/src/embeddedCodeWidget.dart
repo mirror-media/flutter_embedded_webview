@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_embedded_webview/src/dcardEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/embeddedCodeType.dart';
 import 'package:flutter_embedded_webview/src/fbEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/ytEmbeddedCodeWidget.dart';
@@ -151,6 +152,10 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
         embeddedCode: widget.embeddedCode,
         aspectRatio: widget.aspectRatio,
       );
+    } else if(_embeddedCodeType == EmbeddedCodeType.dcard) {
+      return DcardEmbeddedCodeWidget(
+        embeddedCode: widget.embeddedCode,
+      );
     }
 
     return Stack(
@@ -202,9 +207,6 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
                   _webViewAspectRatio = 16/9;
                 }
                 _webViewBottomPadding = 0;
-              } else if(_embeddedCodeType == EmbeddedCodeType.dcard) {
-                // Set dcard to a fixed ratio
-                _webViewAspectRatio = 1/1.8;
               } else {
                 _webViewWidth = double.tryParse(
                   await _webViewController
