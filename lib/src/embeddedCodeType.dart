@@ -4,6 +4,7 @@ enum EmbeddedCodeType {
   twitter,
   tiktok,
   dcard,
+  googleForms,
   googleMap,
   youtube,
 }
@@ -20,6 +21,8 @@ class EmbeddedCode {
       return EmbeddedCodeType.tiktok;
     } else if(embeddedCode.contains('embed.dcard.tw/v1/posts')) {
       return EmbeddedCodeType.dcard;
+    } else if(embeddedCode.contains('docs.google.com/forms')) {
+      return EmbeddedCodeType.googleForms;
     } else if(embeddedCode.contains('www.google.com/maps/embed')) {
       return EmbeddedCodeType.googleMap;
     } else if(embeddedCode.contains('www.youtube.com/embed')) {
@@ -60,6 +63,12 @@ class EmbeddedCode {
       case EmbeddedCodeType.dcard:
         return RegExp(
           r'(https:\/\/embed.dcard.tw\/v1\/posts\/[0-9]+)',
+          caseSensitive: false,
+        );
+      case EmbeddedCodeType.googleForms:
+        // <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeI8_vYyaJgM7SJM4Y9AWfLq-tglWZh6yt7bEXEOJr_L-hV1A/viewform?formkey=dGx0b1ZrTnoyZDgtYXItMWVBdVlQQWc6MQ/viewform?embedded=true" width="640" height="1098" frameborder="0" marginheight="0" marginwidth="0">載入中…</iframe>
+        return RegExp(
+          r'src="(https://docs.google.com/forms/d/e/.*)/viewform?embedded=true',
           caseSensitive: false,
         );
       case EmbeddedCodeType.googleMap:
