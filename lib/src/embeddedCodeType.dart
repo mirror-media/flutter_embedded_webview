@@ -9,24 +9,23 @@ enum EmbeddedCodeType {
   youtube,
 }
 
+Map<String, EmbeddedCodeType> embeddedCodeTypeMap = {
+  'www.facebook.com/plugins': EmbeddedCodeType.facebook,
+  'instagram-media': EmbeddedCodeType.instagram,
+  'twitter-tweet': EmbeddedCodeType.twitter,
+  'class="tiktok-embed"': EmbeddedCodeType.tiktok,
+  'embed.dcard.tw/v1/posts': EmbeddedCodeType.dcard,
+  'docs.google.com/forms': EmbeddedCodeType.googleForms,
+  'www.google.com/maps/embed': EmbeddedCodeType.googleMap,
+  'www.youtube.com/embed': EmbeddedCodeType.youtube,
+};
+
 class EmbeddedCode {
   static EmbeddedCodeType? checkEmbeddedCodeType(String embeddedCode) {
-    if(embeddedCode.contains('www.facebook.com/plugins')) {
-      return EmbeddedCodeType.facebook;
-    } else if(embeddedCode.contains('instagram-media')) {
-      return EmbeddedCodeType.instagram;
-    } else if(embeddedCode.contains('twitter-tweet')) {
-      return EmbeddedCodeType.twitter;
-    } else if(embeddedCode.contains('class="tiktok-embed"')) {
-      return EmbeddedCodeType.tiktok;
-    } else if(embeddedCode.contains('embed.dcard.tw/v1/posts')) {
-      return EmbeddedCodeType.dcard;
-    } else if(embeddedCode.contains('docs.google.com/forms')) {
-      return EmbeddedCodeType.googleForms;
-    } else if(embeddedCode.contains('www.google.com/maps/embed')) {
-      return EmbeddedCodeType.googleMap;
-    } else if(embeddedCode.contains('www.youtube.com/embed')) {
-      return EmbeddedCodeType.youtube;
+    for(String key in embeddedCodeTypeMap.keys) {
+      if(embeddedCode.contains(key)) {
+        return embeddedCodeTypeMap[key];
+      }
     }
 
     return null;
