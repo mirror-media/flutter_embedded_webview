@@ -21,7 +21,7 @@ Map<String, EmbeddedCodeType> embeddedCodeTypeMap = {
 };
 
 class EmbeddedCode {
-  static EmbeddedCodeType? checkEmbeddedCodeType(String embeddedCode) {
+  static EmbeddedCodeType? findEmbeddedCodeType(String embeddedCode) {
     for(String key in embeddedCodeTypeMap.keys) {
       if(embeddedCode.contains(key)) {
         return embeddedCodeTypeMap[key];

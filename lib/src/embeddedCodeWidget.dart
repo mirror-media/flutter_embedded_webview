@@ -41,7 +41,7 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
 
   @override
   void initState() {
-    _embeddedCodeType = EmbeddedCode.checkEmbeddedCodeType(widget.embeddedCode);
+    _embeddedCodeType = EmbeddedCode.findEmbeddedCodeType(widget.embeddedCode);
     _webViewAspectRatio = widget.aspectRatio ?? 16 / 9;
     _webViewBottomPadding = 16;
     super.initState();
