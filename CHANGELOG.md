@@ -1,6 +1,10 @@
+## 0.1.1
+### Changed
+- Refactor findEmbeddedCodeType function
+
 ## 0.1.0
 ### Added
-- add google forms embedded code webview
+- Add google forms embedded code webview
 
 ## 0.0.1
 ### Added
