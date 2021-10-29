@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_embedded_webview/src/dcardEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/embeddedCodeType.dart';
 import 'package:flutter_embedded_webview/src/fbEmbeddedCodeWidget.dart';
+import 'package:flutter_embedded_webview/src/googleFormsEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/ytEmbeddedCodeWidget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -154,6 +155,10 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
       );
     } else if(_embeddedCodeType == EmbeddedCodeType.dcard) {
       return DcardEmbeddedCodeWidget(
+        embeddedCode: widget.embeddedCode,
+      );
+    } else if(_embeddedCodeType == EmbeddedCodeType.googleForms) {
+      return GoogleFormsEmbeddedCodeWidget(
         embeddedCode: widget.embeddedCode,
       );
     }
