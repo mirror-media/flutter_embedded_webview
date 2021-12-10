@@ -1,3 +1,8 @@
+## 0.1.2
+### Changed
+- Set _webViewController default value to null
+- Upgrade webview_flutter plugin version to 2.8.0
+
 ## 0.1.1
 ### Changed
 - Refactor findEmbeddedCodeType function
