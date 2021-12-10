@@ -29,7 +29,7 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
   bool _screenIsReseted = false;
   
   late final EmbeddedCodeType? _embeddedCodeType;
-  late WebViewController _webViewController;
+  WebViewController? _webViewController;
 
   double? _webViewWidth;
   double? _webViewHeight;
@@ -56,12 +56,12 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
 
       String? videoId = videoIdRegExp.firstMatch(widget.embeddedCode)!.group(1);
 
-      _webViewController.loadUrl(
+      _webViewController!.loadUrl(
         'https://www.tiktok.com/embed/v2/$videoId',
       );
     } else {
       String html = _getHtml(embeddedCode, width);
-      _webViewController.loadUrl(
+      _webViewController!.loadUrl(
         Uri.dataFromString(
           html,
           mimeType: 'text/html',
@@ -183,15 +183,15 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
             gestureRecognizers: null,
             onPageFinished: (e) async{
               if(_embeddedCodeType == EmbeddedCodeType.instagram) {
-                await _webViewController.evaluateJavascript('instgrm.Embeds.process();');
+                await _webViewController!.evaluateJavascript('instgrm.Embeds.process();');
                 // waiting for iframe rendering(workaround)
                 await Future.delayed(const Duration(seconds: 5));
                 _webViewWidth = double.tryParse(
-                  await _webViewController
+                  await _webViewController!
                       .evaluateJavascript("document.documentElement.scrollWidth;"),
                 );
                 _webViewHeight = double.tryParse(
-                  await _webViewController
+                  await _webViewController!
                       .evaluateJavascript('document.querySelector(".instagram-media").getBoundingClientRect().height;'),
                 );
               } else if(_embeddedCodeType == EmbeddedCodeType.twitter) {
@@ -199,12 +199,12 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
                 while (_webViewHeight == null || _webViewHeight == 0) {
                   await Future.delayed(const Duration(seconds: 1));
                   _webViewHeight = double.tryParse(
-                    await _webViewController
+                    await _webViewController!
                         .evaluateJavascript('document.querySelector(".twitter-tweet").getBoundingClientRect().height;'),
                   );
                 }
                 _webViewWidth = double.tryParse(
-                  await _webViewController
+                  await _webViewController!
                       .evaluateJavascript('document.querySelector(".twitter-tweet").getBoundingClientRect().width;'),
                 );
               } else if(_embeddedCodeType == EmbeddedCodeType.facebook) {
@@ -214,11 +214,11 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
                 _webViewBottomPadding = 0;
               } else {
                 _webViewWidth = double.tryParse(
-                  await _webViewController
+                  await _webViewController!
                       .evaluateJavascript("document.documentElement.scrollWidth;"),
                 );
                 _webViewHeight = double.tryParse(
-                  await _webViewController
+                  await _webViewController!
                       .evaluateJavascript("document.documentElement.scrollHeight;"),
                 );
               }
