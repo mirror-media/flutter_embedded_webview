@@ -1,7 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_embedded_webview/src/embeddedCodeType.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -20,106 +20,109 @@ class _DcardEmbeddedCodeWidgetState extends State<DcardEmbeddedCodeWidget> {
   double _aspectRatio = 1;
   late WebViewController _webViewController;
 
-  void _loadHtmlFromAssets(embeddedCode) {
-    String html = _getHtml(embeddedCode);
-    _webViewController.loadUrl(
-      Uri.dataFromString(
-        html,
-        mimeType: 'text/html',
-        encoding: Encoding.getByName('utf-8'),
-      ).toString()
-    );
+  @override
+  void initState() {
+    super.initState();
+    if (Platform.isAndroid) {
+      WebView.platform = SurfaceAndroidWebView();
+    }
   }
 
   String _getHtml(String embeddedCode) {
     return '''
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=358.0, user-scalable=no, initial-scale=1.0001, maximum-scale=1.0001, minimum-scale=1.0001, shrink-to-fit=no">
-  <meta http-equiv="X-UA-Compatible" content="chrome=1">
-
-  <title>Document</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0; 
-      background: #F5F5F5;
-    }
-  </style>
-</head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <style>
+      *{box-sizing: border-box;margin:0px; padding:0px;}
+        #widget {
+                  display: flex;
+                  justify-content: center;
+                  margin: 0 auto;
+                  max-width:100%;
+              }      
+    </style>
+  </head>
   <body>
-    $embeddedCode
+    <div id="widget">$embeddedCode</div>
+    $dynamicAspectRatioScriptSetup
+    $dynamicAspectRatioScriptCheck
   </body>
 </html>
     ''';
+  }
+
+  JavascriptChannel _getAspectRatioJavascriptChannel() {
+    return JavascriptChannel(
+        name: 'PageAspectRatio',
+        onMessageReceived: (JavascriptMessage message) {
+          _setAspectRatio(double.parse(message.message));
+        });
+  }
+
+  void _setAspectRatio(double aspectRatio) {
+    if(aspectRatio != 0) {
+      setState(() {
+        _aspectRatio = aspectRatio;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        return Stack(
-          children: [
-            SizedBox(
-              width: constraints.maxWidth,
-              height: constraints.maxWidth/_aspectRatio,
-              child: WebView(
-                onWebViewCreated: (WebViewController webViewController) {
-                  _webViewController = webViewController;
-                  _loadHtmlFromAssets(widget.embeddedCode);
+        return SizedBox(
+          width: constraints.maxWidth,
+          height: constraints.maxWidth/_aspectRatio,
+          child: WebView(
+            onWebViewCreated: (WebViewController webViewController) {
+              _webViewController = webViewController;
+              _webViewController.loadUrl(
+                Uri.dataFromString(
+                  _getHtml(widget.embeddedCode),
+                  mimeType: 'text/html',
+                  encoding: Encoding.getByName('utf-8'),
+                ).toString()
+              );
+            },
+            javascriptChannels:
+                <JavascriptChannel> {
+                  _getAspectRatioJavascriptChannel(),
                 },
-                javascriptMode: JavascriptMode.unrestricted,
-                onPageFinished: (e) async{
-                  await Future.delayed(const Duration(seconds: 1));
-                  double? w = double.tryParse(
-                    await _webViewController
-                        .evaluateJavascript('document.querySelector("body").getBoundingClientRect().width'),
-                  );
-                  double? h = double.tryParse(
-                    await _webViewController
-                        .evaluateJavascript('document.querySelector("body").getBoundingClientRect().height'),
-                  );
-
-                  if(w != null && h != null) {
-                    if(w == 0.0) {
-                      w = constraints.maxWidth;
-                    }
-                    double ratio = w/h;
-                    if(ratio != _aspectRatio) {
-                      if(mounted) {
-                        setState(() {
-                          _aspectRatio = ratio;
-                        });
-                      }
-                    }
-                  }
-                },
-              ),
-            ),
-            InkWell(
-              onTap: () async{
-                RegExp regExp = EmbeddedCode.getLaunchUrlRegExpByType(EmbeddedCodeType.dcard)!;
-                String url = regExp.firstMatch(widget.embeddedCode)!.group(1)!;
-                url = Uri.decodeFull(url);
-
-                if (await canLaunch(url)) {
-                  await launch(url);
-                } else {
-                  throw 'Could not launch $url';
-                }
-              },
-              child: Container(
-                width: constraints.maxWidth,
-                height: constraints.maxWidth/_aspectRatio,
-                color: Colors.transparent,
-              ),
-            ),
-          ],
+            javascriptMode: JavascriptMode.unrestricted,
+            onPageFinished: (e) {
+              _webViewController.runJavascript('setTimeout(() => PageAspectRatio(), 0)');
+            },
+            navigationDelegate: (navigation) async {
+              final url = navigation.url;
+              if (navigation.isForMainFrame && await canLaunch(url)) {
+                launch(url);
+                return NavigationDecision.prevent;
+              }
+              return NavigationDecision.navigate;
+            }
+          ),
         );
       }
     );
   }
+
+  static const String dynamicAspectRatioScriptSetup = """
+    <script type="text/javascript">
+      const widget = document.getElementById('widget');
+      const sendAspectRatio = () => PageAspectRatio.postMessage(widget.clientWidth/widget.clientHeight);
+    </script>
+  """;
+
+  static const String dynamicAspectRatioScriptCheck = """
+    <script type="text/javascript">
+      const onWidgetResize = (widgets) => sendAspectRatio();
+      const resize_ob = new ResizeObserver(onWidgetResize);
+      resize_ob.observe(widget);
+    </script>
+  """;
 }
