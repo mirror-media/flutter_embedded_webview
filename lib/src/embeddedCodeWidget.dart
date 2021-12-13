@@ -6,6 +6,7 @@ import 'package:flutter_embedded_webview/src/dcardEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/embeddedCodeType.dart';
 import 'package:flutter_embedded_webview/src/fbEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/googleFormsEmbeddedCodeWidget.dart';
+import 'package:flutter_embedded_webview/src/instagramEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/ytEmbeddedCodeWidget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -103,7 +104,6 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
     }
   </style>
 </head>
-  <script src="https://www.instagram.com/embed.js"></script>
   <body>
     <center>
       <div class="iframe-width">
@@ -161,6 +161,10 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
       return GoogleFormsEmbeddedCodeWidget(
         embeddedCode: widget.embeddedCode,
       );
+    } else if(_embeddedCodeType == EmbeddedCodeType.instagram) {
+      return InstagramEmbeddedCodeWidget(
+        embeddedCode: widget.embeddedCode,
+      );
     }
 
     return Stack(
@@ -182,19 +186,7 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
             javascriptMode: JavascriptMode.unrestricted,
             gestureRecognizers: null,
             onPageFinished: (e) async{
-              if(_embeddedCodeType == EmbeddedCodeType.instagram) {
-                await _webViewController!.evaluateJavascript('instgrm.Embeds.process();');
-                // waiting for iframe rendering(workaround)
-                await Future.delayed(const Duration(seconds: 5));
-                _webViewWidth = double.tryParse(
-                  await _webViewController!
-                      .evaluateJavascript("document.documentElement.scrollWidth;"),
-                );
-                _webViewHeight = double.tryParse(
-                  await _webViewController!
-                      .evaluateJavascript('document.querySelector(".instagram-media").getBoundingClientRect().height;'),
-                );
-              } else if(_embeddedCodeType == EmbeddedCodeType.twitter) {
+              if(_embeddedCodeType == EmbeddedCodeType.twitter) {
                 // waiting for iframe rendering(workaround)
                 while (_webViewHeight == null || _webViewHeight == 0) {
                   await Future.delayed(const Duration(seconds: 1));
