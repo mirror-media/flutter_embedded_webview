@@ -66,7 +66,6 @@ class _InstagramEmbeddedCodeWidgetState extends State<InstagramEmbeddedCodeWidge
 
   void _setAspectRatio(double aspectRatio) {
     if(aspectRatio != 0) {
-      print(aspectRatio);
       setState(() {
         _aspectRatio = aspectRatio;
       });
@@ -77,8 +76,6 @@ class _InstagramEmbeddedCodeWidgetState extends State<InstagramEmbeddedCodeWidge
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        print("LayoutBuilder width: ${constraints.maxWidth}");
-        print("LayoutBuilder height: ${constraints.maxWidth/_aspectRatio}");
         return SizedBox(
           width: constraints.maxWidth,
           height: constraints.maxWidth/_aspectRatio,
