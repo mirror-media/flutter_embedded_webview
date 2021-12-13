@@ -7,6 +7,7 @@ import 'package:flutter_embedded_webview/src/embeddedCodeType.dart';
 import 'package:flutter_embedded_webview/src/fbEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/googleFormsEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/instagramEmbeddedCodeWidget.dart';
+import 'package:flutter_embedded_webview/src/twitterEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/ytEmbeddedCodeWidget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -165,6 +166,10 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
       return InstagramEmbeddedCodeWidget(
         embeddedCode: widget.embeddedCode,
       );
+    } else if(_embeddedCodeType == EmbeddedCodeType.twitter) {
+      return TwitterEmbeddedCodeWidget(
+        embeddedCode: widget.embeddedCode,
+      );
     }
 
     return Stack(
@@ -186,20 +191,7 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
             javascriptMode: JavascriptMode.unrestricted,
             gestureRecognizers: null,
             onPageFinished: (e) async{
-              if(_embeddedCodeType == EmbeddedCodeType.twitter) {
-                // waiting for iframe rendering(workaround)
-                while (_webViewHeight == null || _webViewHeight == 0) {
-                  await Future.delayed(const Duration(seconds: 1));
-                  _webViewHeight = double.tryParse(
-                    await _webViewController!
-                        .evaluateJavascript('document.querySelector(".twitter-tweet").getBoundingClientRect().height;'),
-                  );
-                }
-                _webViewWidth = double.tryParse(
-                  await _webViewController!
-                      .evaluateJavascript('document.querySelector(".twitter-tweet").getBoundingClientRect().width;'),
-                );
-              } else if(_embeddedCodeType == EmbeddedCodeType.facebook) {
+              if(_embeddedCodeType == EmbeddedCodeType.facebook) {
                 if(widget.embeddedCode.contains('www.facebook.com/plugins/video.php')) {
                   _webViewAspectRatio = 16/9;
                 }
