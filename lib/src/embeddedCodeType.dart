@@ -16,7 +16,7 @@ Map<String, EmbeddedCodeType> embeddedCodeTypeMap = {
   'class="tiktok-embed"': EmbeddedCodeType.tiktok,
   'embed.dcard.tw/v1/posts': EmbeddedCodeType.dcard,
   'docs.google.com/forms': EmbeddedCodeType.googleForms,
-  'www.google.com/maps/embed': EmbeddedCodeType.googleMap,
+  'maps.google.com/maps': EmbeddedCodeType.googleMap,
   'www.youtube.com/embed': EmbeddedCodeType.youtube,
 };
 
