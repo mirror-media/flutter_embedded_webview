@@ -4,7 +4,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_embedded_webview/src/dcardEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/embeddedCodeType.dart';
-import 'package:flutter_embedded_webview/src/fbEmbeddedCodeWidget.dart';
+import 'package:flutter_embedded_webview/src/facebookEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/googleFormsEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/instagramEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/twitterEmbeddedCodeWidget.dart';
@@ -75,14 +75,6 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
 
   String _getHtml(String embeddedCode, double width) {
     double scale = 1.0001;
-    if(_embeddedCodeType == EmbeddedCodeType.facebook) {
-      RegExp widthRegExp = RegExp(
-        r'width="(.[0-9]*)"',
-        caseSensitive: false,
-      );
-      double facebookIframeWidth = double.parse(widthRegExp.firstMatch(widget.embeddedCode)!.group(1)!);
-      scale = width/facebookIframeWidth;
-    }
 
     return '''
 <!DOCTYPE html>
@@ -145,10 +137,9 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
     var height = MediaQuery.of(context).size.height;
 
     super.build(context);
-    // rendering a special iframe webview of facebook in android,
-    // or it will be getting screen overflow.
-    if(_embeddedCodeType == EmbeddedCodeType.facebook && Platform.isAndroid) {
-      return FbEmbeddedCodeWidget(embeddedCode: widget.embeddedCode);
+
+    if(_embeddedCodeType == EmbeddedCodeType.facebook) {
+      return FacebookEmbeddedCodeWidget(embeddedCode: widget.embeddedCode);
     } else if(_embeddedCodeType == EmbeddedCodeType.youtube) {
       return YtEmbeddedCodeWidget(
         embeddedCode: widget.embeddedCode,
@@ -191,21 +182,14 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
             javascriptMode: JavascriptMode.unrestricted,
             gestureRecognizers: null,
             onPageFinished: (e) async{
-              if(_embeddedCodeType == EmbeddedCodeType.facebook) {
-                if(widget.embeddedCode.contains('www.facebook.com/plugins/video.php')) {
-                  _webViewAspectRatio = 16/9;
-                }
-                _webViewBottomPadding = 0;
-              } else {
-                _webViewWidth = double.tryParse(
-                  await _webViewController!
-                      .evaluateJavascript("document.documentElement.scrollWidth;"),
-                );
-                _webViewHeight = double.tryParse(
-                  await _webViewController!
-                      .evaluateJavascript("document.documentElement.scrollHeight;"),
-                );
-              }
+              _webViewWidth = double.tryParse(
+                await _webViewController!
+                    .runJavascriptReturningResult("document.documentElement.scrollWidth;"),
+              );
+              _webViewHeight = double.tryParse(
+                await _webViewController!
+                    .runJavascriptReturningResult("document.documentElement.scrollHeight;"),
+              );
               // reset the webview size
               if(mounted && !_screenIsReseted) {
                 setState(() {
