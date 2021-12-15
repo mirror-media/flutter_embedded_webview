@@ -4,6 +4,7 @@ import 'package:flutter_embedded_webview/src/embeddedCodeType.dart';
 import 'package:flutter_embedded_webview/src/facebookEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/generalEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/googleFormsEmbeddedCodeWidget.dart';
+import 'package:flutter_embedded_webview/src/googleMapEmbeddedWidget.dart';
 import 'package:flutter_embedded_webview/src/instagramEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/tiktokEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/twitterEmbeddedCodeWidget.dart';
@@ -67,7 +68,11 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
       return TiktokEmbeddedCodeWidget(
         embeddedCode: widget.embeddedCode,
       );
-    }
+    } else if(_embeddedCodeType == EmbeddedCodeType.googleMap) {
+      return GoogleMapEmbeddedCodeWidget(
+        embeddedCode: widget.embeddedCode,
+      );
+    } 
 
     return GeneralEmbeddedCodeWidget(embeddedCode: widget.embeddedCode);
   }
