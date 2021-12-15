@@ -7,6 +7,7 @@ import 'package:flutter_embedded_webview/src/embeddedCodeType.dart';
 import 'package:flutter_embedded_webview/src/facebookEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/googleFormsEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/instagramEmbeddedCodeWidget.dart';
+import 'package:flutter_embedded_webview/src/tiktokEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/twitterEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/ytEmbeddedCodeWidget.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -50,27 +51,14 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
   }
 
   _loadHtmlFromAssets(String embeddedCode, double width) {
-    if(_embeddedCodeType == EmbeddedCodeType.tiktok) {
-      RegExp videoIdRegExp = RegExp(
-        r'data-video-id="(.[0-9]*)"',
-        caseSensitive: false,
-      );
-
-      String? videoId = videoIdRegExp.firstMatch(widget.embeddedCode)!.group(1);
-
-      _webViewController!.loadUrl(
-        'https://www.tiktok.com/embed/v2/$videoId',
-      );
-    } else {
-      String html = _getHtml(embeddedCode, width);
-      _webViewController!.loadUrl(
-        Uri.dataFromString(
-          html,
-          mimeType: 'text/html',
-          encoding: Encoding.getByName('utf-8'),
-        ).toString()
-      );
-    }
+    String html = _getHtml(embeddedCode, width);
+    _webViewController!.loadUrl(
+      Uri.dataFromString(
+        html,
+        mimeType: 'text/html',
+        encoding: Encoding.getByName('utf-8'),
+      ).toString()
+    );
   }
 
   String _getHtml(String embeddedCode, double width) {
@@ -159,6 +147,10 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget> with AutomaticK
       );
     } else if(_embeddedCodeType == EmbeddedCodeType.twitter) {
       return TwitterEmbeddedCodeWidget(
+        embeddedCode: widget.embeddedCode,
+      );
+    } else if(_embeddedCodeType == EmbeddedCodeType.tiktok) {
+      return TiktokEmbeddedCodeWidget(
         embeddedCode: widget.embeddedCode,
       );
     }
