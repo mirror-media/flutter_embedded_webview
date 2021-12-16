@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_embedded_webview/src/dcardEmbeddedCodeWidget.dart';
+import 'package:flutter_embedded_webview/src/platform/dcardEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/embeddedCodeType.dart';
-import 'package:flutter_embedded_webview/src/facebookEmbeddedCodeWidget.dart';
-import 'package:flutter_embedded_webview/src/generalEmbeddedCodeWidget.dart';
-import 'package:flutter_embedded_webview/src/googleFormsEmbeddedCodeWidget.dart';
-import 'package:flutter_embedded_webview/src/googleMapEmbeddedWidget.dart';
-import 'package:flutter_embedded_webview/src/instagramEmbeddedCodeWidget.dart';
-import 'package:flutter_embedded_webview/src/tiktokEmbeddedCodeWidget.dart';
-import 'package:flutter_embedded_webview/src/twitterEmbeddedCodeWidget.dart';
-import 'package:flutter_embedded_webview/src/ytEmbeddedCodeWidget.dart';
+import 'package:flutter_embedded_webview/src/platform/facebookEmbeddedCodeWidget.dart';
+import 'package:flutter_embedded_webview/src/platform/generalEmbeddedCodeWidget.dart';
+import 'package:flutter_embedded_webview/src/platform/googleFormsEmbeddedCodeWidget.dart';
+import 'package:flutter_embedded_webview/src/platform/googleMapEmbeddedWidget.dart';
+import 'package:flutter_embedded_webview/src/platform/instagramEmbeddedCodeWidget.dart';
+import 'package:flutter_embedded_webview/src/platform/tiktokEmbeddedCodeWidget.dart';
+import 'package:flutter_embedded_webview/src/platform/twitterEmbeddedCodeWidget.dart';
+import 'package:flutter_embedded_webview/src/platform/ytEmbeddedCodeWidget.dart';
 
 @immutable
 class EmbeddedCodeWidget extends StatefulWidget {
