@@ -1,3 +1,7 @@
+## 0.2.0
+### Changed
+- Refactor and Separate every platform embedded webview widget
+
 ## 0.1.2
 ### Changed
 - Set _webViewController default value to null
