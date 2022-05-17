@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class GoogleFormsEmbeddedCodeWidget extends StatefulWidget {
   final String embeddedCode;
@@ -32,36 +32,36 @@ class _GoogleFormsEmbeddedCodeWidgetState
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     var outlinedButton = OutlinedButton(
-          child: const Padding(
-            padding: EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 16.0),
-            child: Text(
-              '表單連結',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-                color: Color(0xff014DB8),
-              ),
+        child: const Padding(
+          padding: EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 16.0),
+          child: Text(
+            '表單連結',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w500,
+              color: Color(0xff014DB8),
             ),
           ),
-          style:ButtonStyle(
-            textStyle: MaterialStateProperty.all(
-              const TextStyle(
-                color: Color(0xff014DB8),
-              ),
-            ),
-            side: MaterialStateProperty.all(
-              const BorderSide(
-                color: Color(0xff014DB8),
-              ),
+        ),
+        style: ButtonStyle(
+          textStyle: MaterialStateProperty.all(
+            const TextStyle(
+              color: Color(0xff014DB8),
             ),
           ),
-          onPressed: () async {
-            if (await canLaunch(_launchUrl)) {
-              await launch(_launchUrl);
-            } else {
-              throw 'Could not launch $_launchUrl';
-            }
-          });
+          side: MaterialStateProperty.all(
+            const BorderSide(
+              color: Color(0xff014DB8),
+            ),
+          ),
+        ),
+        onPressed: () async {
+          if (await canLaunchUrlString(_launchUrl)) {
+            await launchUrlString(_launchUrl);
+          } else {
+            throw 'Could not launch $_launchUrl';
+          }
+        });
     return SizedBox(
       width: width,
       child: outlinedButton,

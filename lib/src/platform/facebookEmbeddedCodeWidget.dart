@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class FacebookEmbeddedCodeWidget extends StatefulWidget {
@@ -13,11 +13,13 @@ class FacebookEmbeddedCodeWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _FacebookEmbeddedCodeWidgetState createState() => _FacebookEmbeddedCodeWidgetState();
+  _FacebookEmbeddedCodeWidgetState createState() =>
+      _FacebookEmbeddedCodeWidgetState();
 }
 
-class _FacebookEmbeddedCodeWidgetState extends State<FacebookEmbeddedCodeWidget> {
-  double _aspectRatio = 16/9;
+class _FacebookEmbeddedCodeWidgetState
+    extends State<FacebookEmbeddedCodeWidget> {
+  double _aspectRatio = 16 / 9;
   late WebViewController _webViewController;
 
   @override
@@ -34,8 +36,9 @@ class _FacebookEmbeddedCodeWidgetState extends State<FacebookEmbeddedCodeWidget>
       r'width="(.[0-9]*)"',
       caseSensitive: false,
     );
-    double facebookIframeWidth = double.parse(widthRegExp.firstMatch(widget.embeddedCode)!.group(1)!);
-    scale = width/facebookIframeWidth;
+    double facebookIframeWidth =
+        double.parse(widthRegExp.firstMatch(widget.embeddedCode)!.group(1)!);
+    scale = width / facebookIframeWidth;
     return '''
 <!DOCTYPE html>
 <html>
@@ -61,7 +64,7 @@ class _FacebookEmbeddedCodeWidgetState extends State<FacebookEmbeddedCodeWidget>
 </html>
 ''';
   }
-  
+
   JavascriptChannel _getAspectRatioJavascriptChannel() {
     return JavascriptChannel(
         name: 'PageAspectRatio',
@@ -71,7 +74,7 @@ class _FacebookEmbeddedCodeWidgetState extends State<FacebookEmbeddedCodeWidget>
   }
 
   void _setAspectRatio(double aspectRatio) {
-    if(aspectRatio != 0) {
+    if (aspectRatio != 0) {
       setState(() {
         _aspectRatio = aspectRatio;
       });
@@ -81,11 +84,11 @@ class _FacebookEmbeddedCodeWidgetState extends State<FacebookEmbeddedCodeWidget>
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        return SizedBox(
-          width: constraints.maxWidth,
-          height: constraints.maxWidth/_aspectRatio,
-          child: WebView(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      return SizedBox(
+        width: constraints.maxWidth,
+        height: constraints.maxWidth / _aspectRatio,
+        child: WebView(
             onWebViewCreated: (WebViewController webViewController) {
               _webViewController = webViewController;
               _webViewController.loadUrl(Uri.dataFromString(
@@ -94,27 +97,25 @@ class _FacebookEmbeddedCodeWidgetState extends State<FacebookEmbeddedCodeWidget>
                 encoding: Encoding.getByName('utf-8'),
               ).toString());
             },
-            javascriptChannels:
-                <JavascriptChannel> {
-                  _getAspectRatioJavascriptChannel(),
-                },
+            javascriptChannels: <JavascriptChannel>{
+              _getAspectRatioJavascriptChannel(),
+            },
             javascriptMode: JavascriptMode.unrestricted,
             gestureRecognizers: null,
-            onPageFinished: (e) async{
-              _webViewController.runJavascript('setTimeout(() => PageAspectRatio(), 0)');
+            onPageFinished: (e) async {
+              _webViewController
+                  .runJavascript('setTimeout(() => PageAspectRatio(), 0)');
             },
             navigationDelegate: (navigation) async {
               final url = navigation.url;
-              if (navigation.isForMainFrame && await canLaunch(url)) {
-                launch(url);
+              if (navigation.isForMainFrame && await canLaunchUrlString(url)) {
+                launchUrlString(url);
                 return NavigationDecision.prevent;
               }
               return NavigationDecision.navigate;
-            }
-          ),
-        );
-      }
-    );
+            }),
+      );
+    });
   }
 
   static const String dynamicAspectRatioScriptSetup = """

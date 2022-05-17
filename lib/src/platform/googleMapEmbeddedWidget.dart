@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class GoogleMapEmbeddedCodeWidget extends StatefulWidget {
@@ -13,11 +13,13 @@ class GoogleMapEmbeddedCodeWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _GoogleMapEmbeddedCodeWidgetState createState() => _GoogleMapEmbeddedCodeWidgetState();
+  _GoogleMapEmbeddedCodeWidgetState createState() =>
+      _GoogleMapEmbeddedCodeWidgetState();
 }
 
-class _GoogleMapEmbeddedCodeWidgetState extends State<GoogleMapEmbeddedCodeWidget> {
-  final double _aspectRatio = 8/7;
+class _GoogleMapEmbeddedCodeWidgetState
+    extends State<GoogleMapEmbeddedCodeWidget> {
+  final double _aspectRatio = 8 / 7;
   late WebViewController _webViewController;
 
   @override
@@ -56,11 +58,11 @@ class _GoogleMapEmbeddedCodeWidgetState extends State<GoogleMapEmbeddedCodeWidge
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        return SizedBox(
-          width: constraints.maxWidth,
-          height: constraints.maxWidth/_aspectRatio,
-          child: WebView(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      return SizedBox(
+        width: constraints.maxWidth,
+        height: constraints.maxWidth / _aspectRatio,
+        child: WebView(
             onWebViewCreated: (WebViewController webViewController) {
               _webViewController = webViewController;
               _webViewController.loadUrl(Uri.dataFromString(
@@ -73,20 +75,18 @@ class _GoogleMapEmbeddedCodeWidgetState extends State<GoogleMapEmbeddedCodeWidge
             gestureRecognizers: null,
             navigationDelegate: (navigation) async {
               final url = navigation.url;
-              if(navigation.isForMainFrame ||
-                url.startsWith('https://maps.google.com/maps?q=') ||
-                url.startsWith('https://www.google.com/maps/embed')) {
+              if (navigation.isForMainFrame ||
+                  url.startsWith('https://maps.google.com/maps?q=') ||
+                  url.startsWith('https://www.google.com/maps/embed')) {
                 return NavigationDecision.navigate;
-              } else if(await canLaunch(url)) {
-                launch(url);
+              } else if (await canLaunchUrlString(url)) {
+                launchUrlString(url);
                 return NavigationDecision.prevent;
               }
-              
+
               return NavigationDecision.prevent;
-            }
-          ),
-        );
-      }
-    );
+            }),
+      );
+    });
   }
 }

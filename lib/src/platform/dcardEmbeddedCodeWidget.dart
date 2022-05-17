@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class DcardEmbeddedCodeWidget extends StatefulWidget {
@@ -13,7 +13,8 @@ class DcardEmbeddedCodeWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _DcardEmbeddedCodeWidgetState createState() => _DcardEmbeddedCodeWidgetState();
+  _DcardEmbeddedCodeWidgetState createState() =>
+      _DcardEmbeddedCodeWidgetState();
 }
 
 class _DcardEmbeddedCodeWidgetState extends State<DcardEmbeddedCodeWidget> {
@@ -64,7 +65,7 @@ class _DcardEmbeddedCodeWidgetState extends State<DcardEmbeddedCodeWidget> {
   }
 
   void _setAspectRatio(double aspectRatio) {
-    if(aspectRatio != 0) {
+    if (aspectRatio != 0) {
       setState(() {
         _aspectRatio = aspectRatio;
       });
@@ -74,41 +75,37 @@ class _DcardEmbeddedCodeWidgetState extends State<DcardEmbeddedCodeWidget> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        return SizedBox(
-          width: constraints.maxWidth,
-          height: constraints.maxWidth/_aspectRatio,
-          child: WebView(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      return SizedBox(
+        width: constraints.maxWidth,
+        height: constraints.maxWidth / _aspectRatio,
+        child: WebView(
             onWebViewCreated: (WebViewController webViewController) {
               _webViewController = webViewController;
-              _webViewController.loadUrl(
-                Uri.dataFromString(
-                  _getHtml(widget.embeddedCode),
-                  mimeType: 'text/html',
-                  encoding: Encoding.getByName('utf-8'),
-                ).toString()
-              );
+              _webViewController.loadUrl(Uri.dataFromString(
+                _getHtml(widget.embeddedCode),
+                mimeType: 'text/html',
+                encoding: Encoding.getByName('utf-8'),
+              ).toString());
             },
-            javascriptChannels:
-                <JavascriptChannel> {
-                  _getAspectRatioJavascriptChannel(),
-                },
+            javascriptChannels: <JavascriptChannel>{
+              _getAspectRatioJavascriptChannel(),
+            },
             javascriptMode: JavascriptMode.unrestricted,
             onPageFinished: (e) {
-              _webViewController.runJavascript('setTimeout(() => PageAspectRatio(), 0)');
+              _webViewController
+                  .runJavascript('setTimeout(() => PageAspectRatio(), 0)');
             },
             navigationDelegate: (navigation) async {
               final url = navigation.url;
-              if (navigation.isForMainFrame && await canLaunch(url)) {
-                launch(url);
+              if (navigation.isForMainFrame && await canLaunchUrlString(url)) {
+                launchUrlString(url);
                 return NavigationDecision.prevent;
               }
               return NavigationDecision.navigate;
-            }
-          ),
-        );
-      }
-    );
+            }),
+      );
+    });
   }
 
   static const String dynamicAspectRatioScriptSetup = """
