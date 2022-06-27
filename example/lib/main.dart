@@ -32,6 +32,8 @@ class _MyHomePageState extends State<MyHomePage> {
   final String tiktokEmbeddedCode =
       '<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@liuruixue0105/video/7106408699614219521" data-video-id="7106408699614219521" style="max-width: 605px;min-width: 325px;" > <section> <a target="_blank" title="@liuruixue0105" href="https://www.tiktok.com/@liuruixue0105">@liuruixue0105</a> <p></p> <a target="_blank" title="♬ 原聲  - 0105" href="https://www.tiktok.com/music/原聲-0105-7106408721009429250">♬ 原聲  - 0105</a> </section> </blockquote> <script async src="https://www.tiktok.com/embed.js"></script>';
 
+  final String fbEmbeddedCode2 =
+      '<iframe src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Fhahow.in%2Fvideos%2F5230595473664123%2F&show_text=false&width=560&t=0" width="560" height="314" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true"></iframe>';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,8 +46,11 @@ class _MyHomePageState extends State<MyHomePage> {
           EmbeddedCodeWidget(
             embeddedCode: fbEmbeddedCode,
           ),
+          // EmbeddedCodeWidget(
+          //   embeddedCode: tiktokEmbeddedCode,
+          // ),
           EmbeddedCodeWidget(
-            embeddedCode: tiktokEmbeddedCode,
+            embeddedCode: fbEmbeddedCode2,
           ),
         ],
       ), // This trailing comma makes auto-formatting nicer for build methods.
