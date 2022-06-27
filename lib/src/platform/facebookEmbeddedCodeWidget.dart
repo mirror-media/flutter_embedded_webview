@@ -24,27 +24,39 @@ class _FacebookEmbeddedCodeWidgetState
 
   @override
   void initState() {
+    _aspectRatio = _setAspectRatioByIframe(widget.embeddedCode);
     super.initState();
     if (Platform.isAndroid) {
       WebView.platform = SurfaceAndroidWebView();
     }
   }
 
-  String _getHtml(String embeddedCode, double width) {
-    double scale = 1.0001;
+  double _setAspectRatioByIframe(String embeddedCode) {
     RegExp widthRegExp = RegExp(
       r'width="(.[0-9]*)"',
       caseSensitive: false,
     );
-    double facebookIframeWidth =
-        double.parse(widthRegExp.firstMatch(widget.embeddedCode)!.group(1)!);
-    scale = width / facebookIframeWidth;
+    RegExp heightRegExp = RegExp(
+      r'height="(.[0-9]*)"',
+      caseSensitive: false,
+    );
+    double? facebookIframeWidth = double.tryParse(
+        widthRegExp.firstMatch(widget.embeddedCode)?.group(1) ?? '');
+    double? facebookIframeHeight = double.tryParse(
+        heightRegExp.firstMatch(widget.embeddedCode)?.group(1) ?? '');
+    if (facebookIframeWidth == null || facebookIframeHeight == null) {
+      return 16 / 9;
+    }
+    return facebookIframeWidth / facebookIframeHeight;
+  }
+
+  String _getHtml(String embeddedCode, double width) {
     return '''
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=$scale">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <style>
       *{box-sizing: border-box;margin:0px; padding:0px;}
@@ -53,7 +65,8 @@ class _FacebookEmbeddedCodeWidgetState
                   justify-content: center;
                   margin: 0 auto;
                   max-width:100%;
-              }      
+              }    
+        iframe{margin:0;width:100%}  
     </style>
   </head>
   <body>
