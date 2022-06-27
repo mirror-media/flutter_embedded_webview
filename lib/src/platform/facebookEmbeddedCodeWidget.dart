@@ -20,6 +20,7 @@ class FacebookEmbeddedCodeWidget extends StatefulWidget {
 class _FacebookEmbeddedCodeWidgetState
     extends State<FacebookEmbeddedCodeWidget> {
   double _aspectRatio = 16 / 9;
+  bool _isVertical = false;
   late WebViewController _webViewController;
 
   @override
@@ -47,6 +48,11 @@ class _FacebookEmbeddedCodeWidgetState
     if (facebookIframeWidth == null || facebookIframeHeight == null) {
       return 16 / 9;
     }
+
+    if ((facebookIframeWidth / facebookIframeHeight) < 16 / 9) {
+      _isVertical = true;
+    }
+
     return facebookIframeWidth / facebookIframeHeight;
   }
 
@@ -87,7 +93,7 @@ class _FacebookEmbeddedCodeWidgetState
   }
 
   void _setAspectRatio(double aspectRatio) {
-    if (aspectRatio != 0) {
+    if (aspectRatio != 0 && _isVertical) {
       setState(() {
         _aspectRatio = aspectRatio;
       });
