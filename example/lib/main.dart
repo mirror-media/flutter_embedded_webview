@@ -34,6 +34,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final String fbEmbeddedCode2 =
       '<iframe src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Fhahow.in%2Fvideos%2F5230595473664123%2F&show_text=false&width=560&t=0" width="560" height="314" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true"></iframe>';
+
+  final String googleDocsEmbeddedCode =
+      '<iframe src="https://docs.google.com/document/d/e/2PACX-1vRzMeUmz-POuwPD2vKQiND4EKhpQ0rzHgaMVLpvI_Dx-bbBiFHr-WaiDcE_F1hkQfLmfkifkuB0uk1N/pub?embedded=true"width="100%" height="450"></iframe>';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,11 +50,14 @@ class _MyHomePageState extends State<MyHomePage> {
           EmbeddedCodeWidget(
             embeddedCode: fbEmbeddedCode,
           ),
-          // EmbeddedCodeWidget(
-          //   embeddedCode: tiktokEmbeddedCode,
-          // ),
+          EmbeddedCodeWidget(
+            embeddedCode: tiktokEmbeddedCode,
+          ),
           EmbeddedCodeWidget(
             embeddedCode: fbEmbeddedCode2,
+          ),
+          EmbeddedCodeWidget(
+            embeddedCode: googleDocsEmbeddedCode,
           ),
         ],
       ), // This trailing comma makes auto-formatting nicer for build methods.
