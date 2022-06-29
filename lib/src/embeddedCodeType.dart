@@ -7,6 +7,7 @@ enum EmbeddedCodeType {
   googleForms,
   googleMap,
   youtube,
+  googleDocs,
 }
 
 Map<String, EmbeddedCodeType> embeddedCodeTypeMap = {
@@ -18,12 +19,13 @@ Map<String, EmbeddedCodeType> embeddedCodeTypeMap = {
   'docs.google.com/forms': EmbeddedCodeType.googleForms,
   'maps.google.com/maps': EmbeddedCodeType.googleMap,
   'www.youtube.com/embed': EmbeddedCodeType.youtube,
+  'docs.google.com/document': EmbeddedCodeType.googleDocs,
 };
 
 class EmbeddedCode {
   static EmbeddedCodeType? findEmbeddedCodeType(String embeddedCode) {
-    for(String key in embeddedCodeTypeMap.keys) {
-      if(embeddedCode.contains(key)) {
+    for (String key in embeddedCodeTypeMap.keys) {
+      if (embeddedCode.contains(key)) {
         return embeddedCodeTypeMap[key];
       }
     }
@@ -32,7 +34,7 @@ class EmbeddedCode {
   }
 
   static RegExp? getLaunchUrlRegExpByType(EmbeddedCodeType? type) {
-    switch(type) {
+    switch (type) {
       case EmbeddedCodeType.facebook:
         // username refer to https://www.facebook.com/help/105399436216001
         // facebook url ex.
@@ -74,7 +76,12 @@ class EmbeddedCode {
         return null;
       case EmbeddedCodeType.youtube:
         return null;
-      default: 
+      case EmbeddedCodeType.googleDocs:
+        return RegExp(
+          r'src="(https://docs.google.com/document/d/e/.*)/viewform?embedded=true',
+          caseSensitive: false,
+        );
+      default:
         return null;
     }
   }
