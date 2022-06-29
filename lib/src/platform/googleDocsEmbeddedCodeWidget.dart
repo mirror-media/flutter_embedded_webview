@@ -59,7 +59,7 @@ class _GoogleDocsEmbeddedCodeWidgetState
 <html>
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=0.85">
     
     <style>
       *{box-sizing: border-box;margin:0px; padding:0px;}
@@ -68,7 +68,12 @@ class _GoogleDocsEmbeddedCodeWidgetState
                   justify-content: center;
                   margin: 0 auto;
                   max-width:100%;
-              }      
+              }
+        iframe{
+          margin:0;
+          width:100%;
+          padding:0px;
+        }      
     </style>
   </head>
   <body>
