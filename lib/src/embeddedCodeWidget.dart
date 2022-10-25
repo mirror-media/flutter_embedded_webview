@@ -6,6 +6,7 @@ import 'package:flutter_embedded_webview/src/platform/generalEmbeddedCodeWidget.
 import 'package:flutter_embedded_webview/src/platform/googleDocsEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/platform/googleFormsEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/platform/googleMapEmbeddedWidget.dart';
+import 'package:flutter_embedded_webview/src/platform/googleSpreadsheetsEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/platform/instagramEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/platform/tiktokEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/platform/twitterEmbeddedCodeWidget.dart';
@@ -77,6 +78,10 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget>
         );
       case EmbeddedCodeType.googleDocs:
         return GoogleDocsEmbeddedCodeWidget(
+          embeddedCode: widget.embeddedCode,
+        );
+      case EmbeddedCodeType.googleSpreadsheets:
+        return GoogleSpreadsheetsEmbeddedCodeWidget(
           embeddedCode: widget.embeddedCode,
         );
       default:

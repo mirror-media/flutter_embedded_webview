@@ -8,6 +8,7 @@ enum EmbeddedCodeType {
   googleMap,
   youtube,
   googleDocs,
+  googleSpreadsheets,
 }
 
 Map<String, EmbeddedCodeType> embeddedCodeTypeMap = {
@@ -20,6 +21,7 @@ Map<String, EmbeddedCodeType> embeddedCodeTypeMap = {
   'maps.google.com/maps': EmbeddedCodeType.googleMap,
   'www.youtube.com/embed': EmbeddedCodeType.youtube,
   'docs.google.com/document': EmbeddedCodeType.googleDocs,
+  'docs.google.com/spreadsheets': EmbeddedCodeType.googleSpreadsheets,
 };
 
 class EmbeddedCode {
@@ -79,6 +81,11 @@ class EmbeddedCode {
       case EmbeddedCodeType.googleDocs:
         return RegExp(
           r'src="(https://docs.google.com/document/d/e/.*)/viewform?embedded=true',
+          caseSensitive: false,
+        );
+      case EmbeddedCodeType.googleSpreadsheets:
+        return RegExp(
+          r'src="(https://docs.google.com/spreadsheets/d/e/.*)/',
           caseSensitive: false,
         );
       default:
