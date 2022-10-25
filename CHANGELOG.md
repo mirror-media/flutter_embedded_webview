@@ -1,3 +1,15 @@
+## 0.4.0
+### Changed
+- Add Google spreadsheets support
+
+## 0.3.1
+### Changed
+- Improve Google docs view effect
+
+## 0.3.0
+### Changed
+- Add Google docs support
+
 ## 0.2.0
 ### Changed
 - Refactor and Separate every platform embedded webview widget
