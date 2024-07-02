@@ -1,6 +1,6 @@
 name: flutter_embedded_webview
 description: A new Flutter package project.
-version: 0.5.1
+version: 0.5.2
 homepage:
 
 environment:
@@ -18,7 +18,7 @@ dependencies:
   # A Flutter plugin for launching a URL.
   url_launcher: ^6.1.2
   
-  intl: ^0.19.0
+  intl: ^0.18.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
