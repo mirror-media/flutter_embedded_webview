@@ -1,6 +1,6 @@
 name: flutter_embedded_webview
 description: A new Flutter package project.
-version: 0.5.4
+version: 0.5.5
 homepage:
 
 environment:
@@ -14,7 +14,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.0
   # A Flutter plugin that provides a WebView widget.
-  webview_flutter: ^3.0.5
+  webview_flutter: ^3.0.4
   # A Flutter plugin for launching a URL.
   url_launcher: ^6.1.2
   
