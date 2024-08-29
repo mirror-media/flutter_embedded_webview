@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -15,15 +13,31 @@ class TiktokEmbeddedCodeWidget extends StatefulWidget {
 }
 
 class _TiktokEmbeddedCodeWidgetState extends State<TiktokEmbeddedCodeWidget> {
-  double _aspectRatio = 16/9;
-  late WebViewController _webViewController;
+  double _aspectRatio = 16 / 9;
+  late final WebViewController _webViewController;
 
   @override
   void initState() {
     super.initState();
-    if (Platform.isAndroid) {
-      WebView.platform = SurfaceAndroidWebView();
-    }
+    _webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..addJavaScriptChannel('PageAspectRatio', onMessageReceived: (message) {
+        _setAspectRatio(double.parse(message.message));
+      })
+      ..setNavigationDelegate(NavigationDelegate(
+        onNavigationRequest: (navigation) async {
+          final url = navigation.url;
+          if (url.startsWith('https://www.tiktok.com/') ||
+              url.startsWith('https://www.tiktok.com/embed/v2')) {
+            return NavigationDecision.navigate;
+          }
+          return NavigationDecision.prevent;
+        },
+      ))
+      ..loadHtmlString(
+        _getHtml(widget.embeddedCode),
+        baseUrl: 'https://www.tiktok.com',
+      );
   }
 
   String _getHtml(String embeddedCode) {
@@ -36,12 +50,12 @@ class _TiktokEmbeddedCodeWidgetState extends State<TiktokEmbeddedCodeWidget> {
     
     <style>
       *{box-sizing: border-box;margin:0px; padding:0px;}
-        #widget {
-                  display: flex;
-                  justify-content: center;
-                  margin: 0 auto;
-                  max-width:100%;
-              }      
+      #widget {
+        display: flex;
+        justify-content: center;
+        margin: 0 auto;
+        max-width:100%;
+      }      
     </style>
   </head>
   <body>
@@ -52,17 +66,9 @@ class _TiktokEmbeddedCodeWidgetState extends State<TiktokEmbeddedCodeWidget> {
 </html>
 ''';
   }
-  
-  JavascriptChannel _getAspectRatioJavascriptChannel() {
-    return JavascriptChannel(
-        name: 'PageAspectRatio',
-        onMessageReceived: (JavascriptMessage message) {
-          _setAspectRatio(double.parse(message.message));
-        });
-  }
 
   void _setAspectRatio(double aspectRatio) {
-    if(aspectRatio != 0) {
+    if (aspectRatio != 0) {
       setState(() {
         _aspectRatio = aspectRatio;
       });
@@ -75,33 +81,10 @@ class _TiktokEmbeddedCodeWidgetState extends State<TiktokEmbeddedCodeWidget> {
       builder: (BuildContext context, BoxConstraints constraints) {
         return SizedBox(
           width: constraints.maxWidth,
-          height: constraints.maxWidth/_aspectRatio,
-          child: WebView(
-            onWebViewCreated: (WebViewController webViewController) {
-              _webViewController = webViewController;
-              _webViewController.loadHtmlString(
-                _getHtml(widget.embeddedCode),
-                baseUrl: 'https://www.tiktok.com'
-              );
-            },
-            javascriptChannels:
-                <JavascriptChannel> {
-                  _getAspectRatioJavascriptChannel(),
-                },
-            javascriptMode: JavascriptMode.unrestricted,
-            onPageFinished: (e) async{
-              _webViewController.runJavascript('setTimeout(() => PageAspectRatio(), 0)');
-            },
-            gestureNavigationEnabled: false,
-            navigationDelegate: (navigation) async {
-              if(navigation.url == 'https://www.tiktok.com/' || navigation.url.startsWith('https://www.tiktok.com/embed/v2')) {
-                return NavigationDecision.navigate;
-              }
-              return NavigationDecision.prevent;
-            }
-          ),
+          height: constraints.maxWidth / _aspectRatio,
+          child: WebViewWidget(controller: _webViewController),
         );
-      }
+      },
     );
   }
 

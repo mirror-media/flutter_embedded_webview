@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class DcardEmbeddedCodeWidget extends StatefulWidget {
   final String embeddedCode;
+
   const DcardEmbeddedCodeWidget({
     Key? key,
     required this.embeddedCode,
@@ -19,14 +19,39 @@ class DcardEmbeddedCodeWidget extends StatefulWidget {
 
 class _DcardEmbeddedCodeWidgetState extends State<DcardEmbeddedCodeWidget> {
   double _aspectRatio = 1;
-  late WebViewController _webViewController;
+  late final WebViewController _webViewController;
 
   @override
   void initState() {
     super.initState();
-    if (Platform.isAndroid) {
-      WebView.platform = SurfaceAndroidWebView();
-    }
+
+    _webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..addJavaScriptChannel(
+        'PageAspectRatio',
+        onMessageReceived: (message) {
+          _setAspectRatio(double.parse(message.message));
+        },
+      )
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onNavigationRequest: (NavigationRequest navigation) async {
+            final url = navigation.url;
+            if (await canLaunchUrlString(url)) {
+              await launchUrlString(url);
+              return NavigationDecision.prevent;
+            }
+            return NavigationDecision.navigate;
+          },
+        ),
+      )
+      ..loadRequest(
+        Uri.dataFromString(
+          _getHtml(widget.embeddedCode),
+          mimeType: 'text/html',
+          encoding: Encoding.getByName('utf-8'),
+        ),
+      );
   }
 
   String _getHtml(String embeddedCode) {
@@ -56,14 +81,6 @@ class _DcardEmbeddedCodeWidgetState extends State<DcardEmbeddedCodeWidget> {
     ''';
   }
 
-  JavascriptChannel _getAspectRatioJavascriptChannel() {
-    return JavascriptChannel(
-        name: 'PageAspectRatio',
-        onMessageReceived: (JavascriptMessage message) {
-          _setAspectRatio(double.parse(message.message));
-        });
-  }
-
   void _setAspectRatio(double aspectRatio) {
     if (aspectRatio != 0) {
       setState(() {
@@ -75,37 +92,14 @@ class _DcardEmbeddedCodeWidgetState extends State<DcardEmbeddedCodeWidget> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-      return SizedBox(
-        width: constraints.maxWidth,
-        height: constraints.maxWidth / _aspectRatio,
-        child: WebView(
-            onWebViewCreated: (WebViewController webViewController) {
-              _webViewController = webViewController;
-              _webViewController.loadUrl(Uri.dataFromString(
-                _getHtml(widget.embeddedCode),
-                mimeType: 'text/html',
-                encoding: Encoding.getByName('utf-8'),
-              ).toString());
-            },
-            javascriptChannels: <JavascriptChannel>{
-              _getAspectRatioJavascriptChannel(),
-            },
-            javascriptMode: JavascriptMode.unrestricted,
-            onPageFinished: (e) {
-              _webViewController
-                  .runJavascript('setTimeout(() => PageAspectRatio(), 0)');
-            },
-            navigationDelegate: (navigation) async {
-              final url = navigation.url;
-              if (navigation.isForMainFrame && await canLaunchUrlString(url)) {
-                launchUrlString(url);
-                return NavigationDecision.prevent;
-              }
-              return NavigationDecision.navigate;
-            }),
-      );
-    });
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return SizedBox(
+          width: constraints.maxWidth,
+          height: constraints.maxWidth / _aspectRatio,
+          child: WebViewWidget(controller: _webViewController),
+        );
+      },
+    );
   }
 
   static const String dynamicAspectRatioScriptSetup = """

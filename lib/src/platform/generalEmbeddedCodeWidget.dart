@@ -7,6 +7,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 class GeneralEmbeddedCodeWidget extends StatefulWidget {
   final String embeddedCode;
+
   const GeneralEmbeddedCodeWidget({
     Key? key,
     required this.embeddedCode,
@@ -24,9 +25,6 @@ class _GeneralEmbeddedCodeWidgetState extends State<GeneralEmbeddedCodeWidget> {
   @override
   void initState() {
     super.initState();
-    if (Platform.isAndroid) {
-      WebView.platform = SurfaceAndroidWebView();
-    }
   }
 
   String _getHtml(String embeddedCode) {
@@ -56,14 +54,6 @@ class _GeneralEmbeddedCodeWidgetState extends State<GeneralEmbeddedCodeWidget> {
 ''';
   }
 
-  JavascriptChannel _getAspectRatioJavascriptChannel() {
-    return JavascriptChannel(
-        name: 'PageAspectRatio',
-        onMessageReceived: (JavascriptMessage message) {
-          _setAspectRatio(double.parse(message.message));
-        });
-  }
-
   void _setAspectRatio(double aspectRatio) {
     if (aspectRatio != 0) {
       setState(() {
@@ -79,32 +69,36 @@ class _GeneralEmbeddedCodeWidgetState extends State<GeneralEmbeddedCodeWidget> {
       return SizedBox(
         width: constraints.maxWidth,
         height: constraints.maxWidth / _aspectRatio,
-        child: WebView(
-            onWebViewCreated: (WebViewController webViewController) {
-              _webViewController = webViewController;
-              _webViewController.loadUrl(Uri.dataFromString(
-                _getHtml(widget.embeddedCode),
+        child: WebViewWidget(
+          controller: WebViewController()
+            ..setJavaScriptMode(JavaScriptMode.unrestricted)
+            ..addJavaScriptChannel(
+              'PageAspectRatio',
+              onMessageReceived: (JavaScriptMessage message) {
+                _setAspectRatio(double.parse(message.message));
+              },
+            )
+            ..loadHtmlString(
+              _getHtml(widget.embeddedCode),
+              baseUrl: Uri.dataFromString(
+                '',
                 mimeType: 'text/html',
                 encoding: Encoding.getByName('utf-8'),
-              ).toString());
-            },
-            javascriptChannels: <JavascriptChannel>{
-              _getAspectRatioJavascriptChannel(),
-            },
-            javascriptMode: JavascriptMode.unrestricted,
-            gestureRecognizers: null,
-            onPageFinished: (e) async {
-              _webViewController
-                  .runJavascript('setTimeout(() => PageAspectRatio(), 0)');
-            },
-            navigationDelegate: (navigation) async {
-              final url = navigation.url;
-              if (navigation.isForMainFrame && await canLaunchUrlString(url)) {
-                launchUrlString(url);
-                return NavigationDecision.prevent;
-              }
-              return NavigationDecision.navigate;
-            }),
+              ).toString(),
+            )
+            ..setNavigationDelegate(
+              NavigationDelegate(
+                onNavigationRequest: (NavigationRequest navigation) async {
+                  final url = navigation.url;
+                  if (await canLaunchUrlString(url)) {
+                    launchUrlString(url);
+                    return NavigationDecision.prevent;
+                  }
+                  return NavigationDecision.navigate;
+                },
+              ),
+            ),
+        ),
       );
     });
   }

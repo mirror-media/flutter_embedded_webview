@@ -25,9 +25,6 @@ class _GoogleMapEmbeddedCodeWidgetState
   @override
   void initState() {
     super.initState();
-    if (Platform.isAndroid) {
-      WebView.platform = SurfaceAndroidWebView();
-    }
   }
 
   String _getHtml(String embeddedCode) {
@@ -59,34 +56,37 @@ class _GoogleMapEmbeddedCodeWidgetState
   Widget build(BuildContext context) {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      return SizedBox(
-        width: constraints.maxWidth,
-        height: constraints.maxWidth / _aspectRatio,
-        child: WebView(
-            onWebViewCreated: (WebViewController webViewController) {
-              _webViewController = webViewController;
-              _webViewController.loadUrl(Uri.dataFromString(
-                _getHtml(widget.embeddedCode),
-                mimeType: 'text/html',
-                encoding: Encoding.getByName('utf-8'),
-              ).toString());
-            },
-            javascriptMode: JavascriptMode.unrestricted,
-            gestureRecognizers: null,
-            navigationDelegate: (navigation) async {
-              final url = navigation.url;
-              if (navigation.isForMainFrame ||
-                  url.startsWith('https://maps.google.com/maps?q=') ||
-                  url.startsWith('https://www.google.com/maps/embed')) {
-                return NavigationDecision.navigate;
-              } else if (await canLaunchUrlString(url)) {
-                launchUrlString(url);
-                return NavigationDecision.prevent;
-              }
-
-              return NavigationDecision.prevent;
-            }),
-      );
-    });
+          return SizedBox(
+            width: constraints.maxWidth,
+            height: constraints.maxWidth / _aspectRatio,
+            child: WebViewWidget(
+              controller: WebViewController()
+                ..setJavaScriptMode(JavaScriptMode.unrestricted)
+                ..loadRequest(
+                  Uri.dataFromString(
+                    _getHtml(widget.embeddedCode),
+                    mimeType: 'text/html',
+                    encoding: Encoding.getByName('utf-8'),
+                  ),
+                )
+                ..setNavigationDelegate(
+                  NavigationDelegate(
+                    onNavigationRequest: (NavigationRequest navigation) async {
+                      final url = navigation.url;
+                      if (navigation.isMainFrame ||
+                          url.startsWith('https://maps.google.com/maps?q=') ||
+                          url.startsWith('https://www.google.com/maps/embed')) {
+                        return NavigationDecision.navigate;
+                      } else if (await canLaunchUrlString(url)) {
+                        launchUrlString(url);
+                        return NavigationDecision.prevent;
+                      }
+                      return NavigationDecision.prevent;
+                    },
+                  ),
+                ),
+            ),
+          );
+        });
   }
 }

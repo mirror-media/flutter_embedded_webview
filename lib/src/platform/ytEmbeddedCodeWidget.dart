@@ -4,6 +4,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 class YtEmbeddedCodeWidget extends StatefulWidget {
   final String embeddedCode;
   final double? aspectRatio;
+
   const YtEmbeddedCodeWidget({
     Key? key,
     required this.embeddedCode,
@@ -17,32 +18,38 @@ class YtEmbeddedCodeWidget extends StatefulWidget {
 class _YtEmbeddedCodeWidgetState extends State<YtEmbeddedCodeWidget> {
   late double _aspectRatio;
   late String? _initialUrl;
+  late final WebViewController _controller;
 
   @override
   void initState() {
-    // set initial url
+    super.initState();
+
+    // 设置初始URL
     _initialUrl = _getWebviewInitialUrl();
 
-    // set aspect ratio
-    if(widget.aspectRatio == null) {
+    // 设置纵横比
+    if (widget.aspectRatio == null) {
       _aspectRatio = _getWebviewAspectRatio();
     } else {
       _aspectRatio = widget.aspectRatio!;
     }
-    
-    super.initState();
+
+    // 初始化WebViewController
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..loadRequest(Uri.parse(_initialUrl!));
+
   }
 
-  String? _getWebviewInitialUrl(){
+  String? _getWebviewInitialUrl() {
     try {
       RegExp initialUrlRegExp = RegExp(
         r'src="(https:\/\/www\.youtube\.com\/embed\/\w+)"',
         caseSensitive: false,
       );
       String initialUrl = initialUrlRegExp.firstMatch(widget.embeddedCode)!.group(1)!;
-
       return initialUrl;
-    } catch(e) {
+    } catch (e) {
       return null;
     }
   }
@@ -59,30 +66,28 @@ class _YtEmbeddedCodeWidgetState extends State<YtEmbeddedCodeWidget> {
       );
       double w = double.parse(widthRegExp.firstMatch(widget.embeddedCode)!.group(1)!);
       double h = double.parse(heightRegExp.firstMatch(widget.embeddedCode)!.group(1)!);
-      return w/h;
-    } catch(e) {
-      return 16/9;
+      return w / h;
+    } catch (e) {
+      return 16 / 9;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if(_initialUrl == null) {
+    if (_initialUrl == null) {
       return Container();
     }
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-      return SizedBox(
-        width: constraints.maxWidth,
-        height: constraints.maxWidth/_aspectRatio,
-        child: WebView(
-          initialUrl: _initialUrl,
-          javascriptMode: JavascriptMode.unrestricted,
-          onPageFinished: (e) {},
-        ),
-      );
-      }
+        return SizedBox(
+          width: constraints.maxWidth,
+          height: constraints.maxWidth / _aspectRatio,
+          child: WebViewWidget(
+            controller: _controller,
+          ),
+        );
+      },
     );
   }
 }
