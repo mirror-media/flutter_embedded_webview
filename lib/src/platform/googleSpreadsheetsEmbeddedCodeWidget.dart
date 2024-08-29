@@ -27,9 +27,6 @@ class _GoogleSpreadsheetsEmbeddedCodeWidgetState
   @override
   void initState() {
     super.initState();
-    if (Platform.isAndroid) {
-      WebView.platform = SurfaceAndroidWebView();
-    }
     _aspectRatio = _setAspectRatioByIframe(widget.embeddedCode);
   }
 
@@ -85,60 +82,39 @@ class _GoogleSpreadsheetsEmbeddedCodeWidgetState
 ''';
   }
 
-  JavascriptChannel _getAspectRatioJavascriptChannel() {
-    return JavascriptChannel(
-        name: 'PageAspectRatio',
-        onMessageReceived: (JavascriptMessage message) {
-          _setAspectRatio(double.parse(message.message));
-        });
-  }
-
-  void _setAspectRatio(double aspectRatio) {
-    if (aspectRatio != 0) {
-      setState(() {
-        _aspectRatio = aspectRatio;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      return SizedBox(
-        width: constraints.maxWidth,
-        height: constraints.maxWidth / _aspectRatio,
-        child: WebView(
-            onWebViewCreated: (WebViewController webViewController) {
-              _webViewController = webViewController;
-              _webViewController.loadUrl(Uri.dataFromString(
-                _getHtml(widget.embeddedCode),
-                mimeType: 'text/html',
-                encoding: Encoding.getByName('utf-8'),
-              ).toString());
-            },
-            javascriptChannels: <JavascriptChannel>{
-              _getAspectRatioJavascriptChannel(),
-            },
-            gestureRecognizers: {
-              Factory<OneSequenceGestureRecognizer>(
-                  () => EagerGestureRecognizer())
-            },
-            javascriptMode: JavascriptMode.unrestricted,
-            onPageFinished: (e) async {
-              _webViewController
-                  .runJavascript('setTimeout(() => PageAspectRatio(), 0)');
-            },
-            navigationDelegate: (navigation) async {
-              final url = navigation.url;
-              if (navigation.isForMainFrame && await canLaunchUrlString(url)) {
-                launchUrlString(url);
-                return NavigationDecision.prevent;
-              }
-              return NavigationDecision.navigate;
-            }),
-      );
-    });
+          return SizedBox(
+            width: constraints.maxWidth,
+            height: constraints.maxWidth / _aspectRatio,
+            child: WebViewWidget(
+              controller: WebViewController()
+                ..setJavaScriptMode(JavaScriptMode.unrestricted)
+                ..loadRequest(
+                  Uri.dataFromString(
+                    _getHtml(widget.embeddedCode),
+                    mimeType: 'text/html',
+                    encoding: Encoding.getByName('utf-8'),
+                  ),
+                )
+                ..setNavigationDelegate(
+                  NavigationDelegate(
+                    onNavigationRequest: (NavigationRequest navigation) async {
+                      final url = navigation.url;
+                      if (url.startsWith('https://docs.google.com/') ||
+                          await canLaunchUrlString(url)) {
+                        launchUrlString(url);
+                        return NavigationDecision.prevent;
+                      }
+                      return NavigationDecision.navigate;
+                    },
+                  ),
+                ),
+            ),
+          );
+        });
   }
 
   static const String dynamicAspectRatioScriptSetup = """
