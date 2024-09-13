@@ -109,18 +109,7 @@ class _GoogleDocsEmbeddedCodeWidgetState
                   mimeType: 'text/html',
                   encoding: Encoding.getByName('utf-8'),
                 ))
-                ..setNavigationDelegate(
-                  NavigationDelegate(
-                    onNavigationRequest: (NavigationRequest navigation) async {
-                      final url = navigation.url;
-                      if (await canLaunchUrlString(url)) {
-                        launchUrlString(url);
-                        return NavigationDecision.prevent;
-                      }
-                      return NavigationDecision.navigate;
-                    },
-                  ),
-                ),
+
             ),
           );
         });

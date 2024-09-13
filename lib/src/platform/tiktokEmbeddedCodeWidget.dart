@@ -24,16 +24,6 @@ class _TiktokEmbeddedCodeWidgetState extends State<TiktokEmbeddedCodeWidget> {
       ..addJavaScriptChannel('PageAspectRatio', onMessageReceived: (message) {
         _setAspectRatio(double.parse(message.message));
       })
-      ..setNavigationDelegate(NavigationDelegate(
-        onNavigationRequest: (navigation) async {
-          final url = navigation.url;
-          if (url.startsWith('https://www.tiktok.com/') ||
-              url.startsWith('https://www.tiktok.com/embed/v2')) {
-            return NavigationDecision.navigate;
-          }
-          return NavigationDecision.prevent;
-        },
-      ))
       ..loadHtmlString(
         _getHtml(widget.embeddedCode),
         baseUrl: 'https://www.tiktok.com',

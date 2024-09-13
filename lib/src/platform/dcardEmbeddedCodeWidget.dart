@@ -33,18 +33,6 @@ class _DcardEmbeddedCodeWidgetState extends State<DcardEmbeddedCodeWidget> {
           _setAspectRatio(double.parse(message.message));
         },
       )
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onNavigationRequest: (NavigationRequest navigation) async {
-            final url = navigation.url;
-            if (await canLaunchUrlString(url)) {
-              await launchUrlString(url);
-              return NavigationDecision.prevent;
-            }
-            return NavigationDecision.navigate;
-          },
-        ),
-      )
       ..loadRequest(
         Uri.dataFromString(
           _getHtml(widget.embeddedCode),

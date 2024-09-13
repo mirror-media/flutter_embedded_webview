@@ -98,18 +98,6 @@ class _FacebookEmbeddedCodeWidgetState
             height: constraints.maxWidth / _aspectRatio,
             child: WebViewWidget(
               controller: WebViewController()
-                ..setNavigationDelegate(
-                  NavigationDelegate(
-                    onNavigationRequest: (NavigationRequest navigation) async {
-                      final url = navigation.url;
-                      if (await canLaunchUrlString(url)) {
-                        launchUrlString(url);
-                        return NavigationDecision.prevent;
-                      }
-                      return NavigationDecision.navigate;
-                    },
-                  ),
-                )
                 ..setJavaScriptMode(JavaScriptMode.unrestricted)
                 ..addJavaScriptChannel(
                   'PageAspectRatio',
