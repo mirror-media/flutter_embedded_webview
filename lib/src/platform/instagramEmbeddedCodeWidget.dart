@@ -28,17 +28,6 @@ class _InstagramEmbeddedCodeWidgetState
       ..addJavaScriptChannel('PageAspectRatio', onMessageReceived: (message) {
         _setAspectRatio(double.parse(message.message));
       })
-      ..setNavigationDelegate(NavigationDelegate(
-        onNavigationRequest: (navigation) async {
-          final url = navigation.url;
-          if (url.startsWith('https://www.instagram.com/') &&
-              await canLaunchUrlString(url)) {
-            launchUrlString(url);
-            return NavigationDecision.prevent;
-          }
-          return NavigationDecision.navigate;
-        },
-      ))
       ..loadRequest(Uri.dataFromString(
         _getHtml(widget.embeddedCode),
         mimeType: 'text/html',

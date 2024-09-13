@@ -69,22 +69,6 @@ class _GoogleMapEmbeddedCodeWidgetState
                     encoding: Encoding.getByName('utf-8'),
                   ),
                 )
-                ..setNavigationDelegate(
-                  NavigationDelegate(
-                    onNavigationRequest: (NavigationRequest navigation) async {
-                      final url = navigation.url;
-                      if (navigation.isMainFrame ||
-                          url.startsWith('https://maps.google.com/maps?q=') ||
-                          url.startsWith('https://www.google.com/maps/embed')) {
-                        return NavigationDecision.navigate;
-                      } else if (await canLaunchUrlString(url)) {
-                        launchUrlString(url);
-                        return NavigationDecision.prevent;
-                      }
-                      return NavigationDecision.prevent;
-                    },
-                  ),
-                ),
             ),
           );
         });

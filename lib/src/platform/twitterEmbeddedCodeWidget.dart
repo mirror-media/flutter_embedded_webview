@@ -29,19 +29,6 @@ class _TwitterEmbeddedCodeWidgetState extends State<TwitterEmbeddedCodeWidget> {
       ..addJavaScriptChannel('PageAspectRatio', onMessageReceived: (message) {
         _setAspectRatio(double.parse(message.message));
       })
-      ..setNavigationDelegate(NavigationDelegate(
-        onNavigationRequest: (navigation) async {
-          final url = navigation.url;
-          if (url.startsWith('https://twitter.com/')) {
-            return NavigationDecision.navigate;
-          }
-          if (await canLaunchUrlString(url)) {
-            launchUrlString(url);
-            return NavigationDecision.prevent;
-          }
-          return NavigationDecision.navigate;
-        },
-      ))
       ..loadRequest(Uri.dataFromString(
         _getHtml(widget.embeddedCode),
         mimeType: 'text/html',

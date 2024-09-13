@@ -99,19 +99,6 @@ class _GoogleSpreadsheetsEmbeddedCodeWidgetState
                     encoding: Encoding.getByName('utf-8'),
                   ),
                 )
-                ..setNavigationDelegate(
-                  NavigationDelegate(
-                    onNavigationRequest: (NavigationRequest navigation) async {
-                      final url = navigation.url;
-                      if (url.startsWith('https://docs.google.com/') ||
-                          await canLaunchUrlString(url)) {
-                        launchUrlString(url);
-                        return NavigationDecision.prevent;
-                      }
-                      return NavigationDecision.navigate;
-                    },
-                  ),
-                ),
             ),
           );
         });
