@@ -46,6 +46,7 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget>
 
     switch (_embeddedCodeType) {
       case EmbeddedCodeType.facebook:
+        return Container();
         return FacebookEmbeddedCodeWidget(embeddedCode: widget.embeddedCode);
       case EmbeddedCodeType.instagram:
         return InstagramEmbeddedCodeWidget(
