@@ -16,76 +16,86 @@ class YtEmbeddedCodeWidget extends StatefulWidget {
 }
 
 class _YtEmbeddedCodeWidgetState extends State<YtEmbeddedCodeWidget> {
-  late double _aspectRatio;
-  late String? _initialUrl;
   late final WebViewController _controller;
+  late double _aspectRatio;
 
   @override
   void initState() {
     super.initState();
 
-    // 设置初始URL
-    _initialUrl = _getWebviewInitialUrl();
+    _aspectRatio = widget.aspectRatio ?? _extractAspectRatio();
 
-    // 设置纵横比
-    if (widget.aspectRatio == null) {
-      _aspectRatio = _getWebviewAspectRatio();
-    } else {
-      _aspectRatio = widget.aspectRatio!;
-    }
+    final String? iframeSrc = _extractSrcFromIframe(widget.embeddedCode);
 
-    // 初始化WebViewController
+    final String htmlContent = '''
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body, html {
+              margin: 0;
+              padding: 0;
+              background-color: black;
+              overflow: hidden;
+            }
+            .video-container {
+              position: relative;
+              width: 100%;
+              padding-top: ${100 / _aspectRatio}%;
+            }
+            .video-container iframe {
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              border: none;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="video-container">
+            <iframe
+              src="$iframeSrc"
+              title="YouTube video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen>
+            </iframe>
+          </div>
+        </body>
+      </html>
+    ''';
+
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(Uri.parse(_initialUrl!));
-
+      ..loadHtmlString(htmlContent);
   }
 
-  String? _getWebviewInitialUrl() {
+  double _extractAspectRatio() {
     try {
-      RegExp initialUrlRegExp = RegExp(
-        r'src="(https:\/\/www\.youtube\.com\/embed\/\w+)"',
-        caseSensitive: false,
-      );
-      String initialUrl = initialUrlRegExp.firstMatch(widget.embeddedCode)!.group(1)!;
-      return initialUrl;
-    } catch (e) {
-      return null;
-    }
+      final width = RegExp(r'width="(\d+)"').firstMatch(widget.embeddedCode)?.group(1);
+      final height = RegExp(r'height="(\d+)"').firstMatch(widget.embeddedCode)?.group(1);
+      if (width != null && height != null) {
+        return double.parse(width) / double.parse(height);
+      }
+    } catch (_) {}
+    return 16 / 9;
   }
 
-  double _getWebviewAspectRatio() {
-    try {
-      RegExp widthRegExp = RegExp(
-        r'width="(.[0-9]*)"',
-        caseSensitive: false,
-      );
-      RegExp heightRegExp = RegExp(
-        r'height="(.[0-9]*)"',
-        caseSensitive: false,
-      );
-      double w = double.parse(widthRegExp.firstMatch(widget.embeddedCode)!.group(1)!);
-      double h = double.parse(heightRegExp.firstMatch(widget.embeddedCode)!.group(1)!);
-      return w / h;
-    } catch (e) {
-      return 16 / 9;
-    }
+  String? _extractSrcFromIframe(String code) {
+    final match = RegExp(r'src="([^"]+)"').firstMatch(code);
+    return match?.group(1);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_initialUrl == null) {
-      return Container();
-    }
-
     return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
+      builder: (_, constraints) {
         return SizedBox(
           width: constraints.maxWidth,
           height: constraints.maxWidth / _aspectRatio,
-          child: WebViewWidget(
-            controller: _controller,
-          ),
+          child: WebViewWidget(controller: _controller),
         );
       },
     );
