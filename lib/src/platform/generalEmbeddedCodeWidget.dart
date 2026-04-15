@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class GeneralEmbeddedCodeWidget extends StatefulWidget {
@@ -24,6 +22,26 @@ class _GeneralEmbeddedCodeWidgetState extends State<GeneralEmbeddedCodeWidget> {
 
   @override
   void initState() {
+    _webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..addJavaScriptChannel(
+        'PageAspectRatio',
+        onMessageReceived: (JavaScriptMessage message) {
+          final nextAspectRatio = double.tryParse(message.message);
+          if (nextAspectRatio == null) {
+            return;
+          }
+          _setAspectRatio(nextAspectRatio);
+        },
+      )
+      ..loadHtmlString(
+        _getHtml(widget.embeddedCode),
+        baseUrl: Uri.dataFromString(
+          '',
+          mimeType: 'text/html',
+          encoding: Encoding.getByName('utf-8'),
+        ).toString(),
+      );
     super.initState();
   }
 
@@ -55,7 +73,9 @@ class _GeneralEmbeddedCodeWidgetState extends State<GeneralEmbeddedCodeWidget> {
   }
 
   void _setAspectRatio(double aspectRatio) {
-    if (aspectRatio != 0) {
+    if (aspectRatio.isFinite &&
+        aspectRatio > 0 &&
+        (aspectRatio - _aspectRatio).abs() > 0.01) {
       setState(() {
         _aspectRatio = aspectRatio;
       });
@@ -69,24 +89,7 @@ class _GeneralEmbeddedCodeWidgetState extends State<GeneralEmbeddedCodeWidget> {
       return SizedBox(
         width: constraints.maxWidth,
         height: constraints.maxWidth / _aspectRatio,
-        child: WebViewWidget(
-          controller: WebViewController()
-            ..setJavaScriptMode(JavaScriptMode.unrestricted)
-            ..addJavaScriptChannel(
-              'PageAspectRatio',
-              onMessageReceived: (JavaScriptMessage message) {
-                _setAspectRatio(double.parse(message.message));
-              },
-            )
-            ..loadHtmlString(
-              _getHtml(widget.embeddedCode),
-              baseUrl: Uri.dataFromString(
-                '',
-                mimeType: 'text/html',
-                encoding: Encoding.getByName('utf-8'),
-              ).toString(),
-            )
-        ),
+        child: WebViewWidget(controller: _webViewController),
       );
     });
   }
@@ -94,7 +97,11 @@ class _GeneralEmbeddedCodeWidgetState extends State<GeneralEmbeddedCodeWidget> {
   static const String dynamicAspectRatioScriptSetup = """
     <script type="text/javascript">
       const widget = document.getElementById('widget');
-      const sendAspectRatio = () => PageAspectRatio.postMessage(widget.clientWidth/widget.clientHeight);
+      const sendAspectRatio = () => {
+        if (widget.clientHeight > 0) {
+          PageAspectRatio.postMessage((widget.clientWidth/widget.clientHeight).toString())
+        }
+      };
     </script>
   """;
 
