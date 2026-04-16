@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class FacebookEmbeddedCodeWidget extends StatefulWidget {
@@ -26,6 +24,23 @@ class _FacebookEmbeddedCodeWidgetState
   @override
   void initState() {
     _aspectRatio = _setAspectRatioByIframe(widget.embeddedCode);
+    _webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..addJavaScriptChannel(
+        'PageAspectRatio',
+        onMessageReceived: (message) {
+          final nextAspectRatio = double.tryParse(message.message);
+          if (nextAspectRatio == null) {
+            return;
+          }
+          _setAspectRatio(nextAspectRatio);
+        },
+      )
+      ..loadRequest(Uri.dataFromString(
+        _getHtml(widget.embeddedCode, 0),
+        mimeType: 'text/html',
+        encoding: Encoding.getByName('utf-8'),
+      ));
     super.initState();
   }
 
@@ -68,8 +83,12 @@ class _FacebookEmbeddedCodeWidgetState
                   justify-content: center;
                   margin: 0 auto;
                   max-width:100%;
-              }    
-        iframe{margin:0;width:100%}  
+              }
+        iframe{
+          margin:0;
+          width:100%;
+          border:0;
+        }
     </style>
   </head>
   <body>
@@ -82,7 +101,10 @@ class _FacebookEmbeddedCodeWidgetState
   }
 
   void _setAspectRatio(double aspectRatio) {
-    if (aspectRatio != 0 && _isVertical) {
+    if (aspectRatio.isFinite &&
+        aspectRatio > 0 &&
+        _isVertical &&
+        (aspectRatio - _aspectRatio).abs() > 0.01) {
       setState(() {
         _aspectRatio = aspectRatio;
       });
@@ -97,19 +119,7 @@ class _FacebookEmbeddedCodeWidgetState
             width: constraints.maxWidth,
             height: constraints.maxWidth / _aspectRatio,
             child: WebViewWidget(
-              controller: WebViewController()
-                ..setJavaScriptMode(JavaScriptMode.unrestricted)
-                ..addJavaScriptChannel(
-                  'PageAspectRatio',
-                  onMessageReceived: (message) {
-                    _setAspectRatio(double.parse(message.message));
-                  },
-                )
-                ..loadRequest(Uri.dataFromString(
-                  _getHtml(widget.embeddedCode, constraints.maxWidth),
-                  mimeType: 'text/html',
-                  encoding: Encoding.getByName('utf-8'),
-                )),
+              controller: _webViewController,
             ),
           );
         });
@@ -118,7 +128,11 @@ class _FacebookEmbeddedCodeWidgetState
   static const String dynamicAspectRatioScriptSetup = """
     <script type="text/javascript">
       const widget = document.getElementById('widget');
-      const sendAspectRatio = () => PageAspectRatio.postMessage(widget.clientWidth/widget.clientHeight);
+      const sendAspectRatio = () => {
+        if (widget.clientHeight > 0) {
+          PageAspectRatio.postMessage((widget.clientWidth/widget.clientHeight).toString())
+        }
+      };
     </script>
   """;
 
