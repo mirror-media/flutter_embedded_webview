@@ -38,6 +38,9 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget>
   @override
   void initState() {
     _embeddedCodeType = EmbeddedCode.findEmbeddedCodeType(widget.embeddedCode);
+    debugPrint(
+      '[EmbeddedCodeWidget] detectedType=${_embeddedCodeType?.name ?? 'general'} snippet=${widget.embeddedCode.substring(0, widget.embeddedCode.length > 120 ? 120 : widget.embeddedCode.length)}',
+    );
     super.initState();
   }
 
