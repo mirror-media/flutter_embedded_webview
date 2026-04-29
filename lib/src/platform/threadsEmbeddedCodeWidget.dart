@@ -20,10 +20,24 @@ class _ThreadsEmbeddedCodeWidgetState extends State<ThreadsEmbeddedCodeWidget> {
   late final WebViewController _webViewController;
   double _height = 400;
 
+  void _log(String message) {
+    debugPrint('[ThreadsEmbed] $message');
+  }
+
   @override
   void initState() {
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onWebResourceError: (error) {
+            _log('web_error code=${error.errorCode} type=${error.errorType} desc=${error.description}');
+          },
+          onPageFinished: (url) {
+            _log('page_finished url=$url');
+          },
+        ),
+      )
       ..addJavaScriptChannel(
         'EmbedHeight',
         onMessageReceived: (message) {
@@ -32,13 +46,21 @@ class _ThreadsEmbeddedCodeWidgetState extends State<ThreadsEmbeddedCodeWidget> {
               !nextHeight.isFinite ||
               nextHeight < 120 ||
               (nextHeight - _height).abs() < 1) {
+            _log('height_ignored raw=${message.message}');
             return;
           }
           if (mounted) {
             setState(() {
               _height = nextHeight;
             });
+            _log('height_updated value=$_height');
           }
+        },
+      )
+      ..addJavaScriptChannel(
+        'ThreadsDebug',
+        onMessageReceived: (message) {
+          _log('js ${message.message}');
         },
       )
       ..loadHtmlString(
@@ -92,11 +114,15 @@ class _ThreadsEmbeddedCodeWidgetState extends State<ThreadsEmbeddedCodeWidget> {
     <script type="text/javascript">
       function extractThreadsPermalink() {
         var permalinkFromData = document.querySelector('[data-text-post-permalink]')?.getAttribute('data-text-post-permalink');
+        if (permalinkFromData && window.ThreadsDebug) ThreadsDebug.postMessage('permalink:data=' + permalinkFromData);
         if (permalinkFromData) return permalinkFromData;
         var cite = document.querySelector('blockquote[cite]')?.getAttribute('cite');
+        if (cite && window.ThreadsDebug) ThreadsDebug.postMessage('permalink:cite=' + cite);
         if (cite) return cite;
         var direct = document.querySelector('a[href*="threads.net/"]')?.getAttribute('href');
+        if (direct && window.ThreadsDebug) ThreadsDebug.postMessage('permalink:anchor=' + direct);
         if (direct) return direct;
+        if (window.ThreadsDebug) ThreadsDebug.postMessage('permalink:none');
         return null;
       }
 
@@ -118,6 +144,7 @@ class _ThreadsEmbeddedCodeWidgetState extends State<ThreadsEmbeddedCodeWidget> {
         iframe.referrerPolicy = 'no-referrer';
         iframe.allow = 'autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share';
         root.appendChild(iframe);
+        if (window.ThreadsDebug) ThreadsDebug.postMessage('fallback_iframe=' + src);
       }
 
       function getHeight() {
@@ -134,6 +161,7 @@ class _ThreadsEmbeddedCodeWidgetState extends State<ThreadsEmbeddedCodeWidget> {
 
       function notifyHeight() {
         var h = getHeight();
+        if (window.ThreadsDebug) ThreadsDebug.postMessage('height=' + h);
         if (h > 0 && window.EmbedHeight) {
           window.EmbedHeight.postMessage(String(h));
         }
