@@ -1,5 +1,6 @@
 enum EmbeddedCodeType {
   facebook,
+  threads,
   instagram,
   twitter,
   tiktok,
@@ -13,6 +14,7 @@ enum EmbeddedCodeType {
 
 Map<String, EmbeddedCodeType> embeddedCodeTypeMap = {
   'www.facebook.com/plugins': EmbeddedCodeType.facebook,
+  'threads.net': EmbeddedCodeType.threads,
   'instagram-media': EmbeddedCodeType.instagram,
   'twitter-tweet': EmbeddedCodeType.twitter,
   'class="tiktok-embed"': EmbeddedCodeType.tiktok,
@@ -46,6 +48,11 @@ class EmbeddedCode {
         // https://www.facebook.com/ permalink.php?story_fbid = 229021587215556  &id                 = 11239244970
         return RegExp(
           r'src="https:\/\/www\.facebook\.com\/plugins\/(?:post|video)\.php\?(?:.*)href=(https?(?:%3A%2F%2F|\:\/\/)www\.facebook\.com(?:%2F|\/)(?:permalink\.php(?:%3F|\?)story_fbid|[a-zA-Z0-9.]+)(?:%2F|\/|=|%3D)(?:posts|videos|photos|[0-9]+)(?:%2F[a-z].[0-9]+|\/[a-z].[0-9]+|\&id|%26id)?(?:%2F|\/|=|%3D)[0-9]+)',
+          caseSensitive: false,
+        );
+      case EmbeddedCodeType.threads:
+        return RegExp(
+          r'(https:\/\/www\.threads\.net\/[^\s"<>]+)',
           caseSensitive: false,
         );
       case EmbeddedCodeType.instagram:

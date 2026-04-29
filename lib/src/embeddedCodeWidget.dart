@@ -8,6 +8,7 @@ import 'package:flutter_embedded_webview/src/platform/googleFormsEmbeddedCodeWid
 import 'package:flutter_embedded_webview/src/platform/googleMapEmbeddedWidget.dart';
 import 'package:flutter_embedded_webview/src/platform/googleSpreadsheetsEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/platform/instagramEmbeddedCodeWidget.dart';
+import 'package:flutter_embedded_webview/src/platform/threadsEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/platform/tiktokEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/platform/twitterEmbeddedCodeWidget.dart';
 import 'package:flutter_embedded_webview/src/platform/ytEmbeddedCodeWidget.dart';
@@ -47,6 +48,8 @@ class _EmbeddedCodeWidgetState extends State<EmbeddedCodeWidget>
     switch (_embeddedCodeType) {
       case EmbeddedCodeType.facebook:
         return FacebookEmbeddedCodeWidget(embeddedCode: widget.embeddedCode);
+      case EmbeddedCodeType.threads:
+        return ThreadsEmbeddedCodeWidget(embeddedCode: widget.embeddedCode);
       case EmbeddedCodeType.instagram:
         return InstagramEmbeddedCodeWidget(
           embeddedCode: widget.embeddedCode,
