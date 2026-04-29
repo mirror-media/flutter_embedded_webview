@@ -83,8 +83,43 @@ class _ThreadsEmbeddedCodeWidgetState extends State<ThreadsEmbeddedCodeWidget> {
       #widget {
         width: 100%;
       }
+      #widget iframe {
+        width: 100% !important;
+        min-height: 420px;
+        border: 0;
+      }
     </style>
     <script type="text/javascript">
+      function extractThreadsPermalink() {
+        var permalinkFromData = document.querySelector('[data-text-post-permalink]')?.getAttribute('data-text-post-permalink');
+        if (permalinkFromData) return permalinkFromData;
+        var cite = document.querySelector('blockquote[cite]')?.getAttribute('cite');
+        if (cite) return cite;
+        var direct = document.querySelector('a[href*="threads.net/"]')?.getAttribute('href');
+        if (direct) return direct;
+        return null;
+      }
+
+      function buildFallbackIframe() {
+        var permalink = extractThreadsPermalink();
+        if (!permalink) return;
+        var normalized = permalink;
+        while (normalized.endsWith('/')) {
+          normalized = normalized.slice(0, -1);
+        }
+        var src = normalized.endsWith('/embed') ? normalized : normalized + '/embed';
+        var root = document.getElementById('widget');
+        if (!root) return;
+        if (root.querySelector('iframe')) return;
+        root.innerHTML = '';
+        var iframe = document.createElement('iframe');
+        iframe.src = src;
+        iframe.loading = 'lazy';
+        iframe.referrerPolicy = 'no-referrer';
+        iframe.allow = 'autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share';
+        root.appendChild(iframe);
+      }
+
       function getHeight() {
         var body = document.body;
         var html = document.documentElement;
@@ -108,6 +143,12 @@ class _ThreadsEmbeddedCodeWidgetState extends State<ThreadsEmbeddedCodeWidget> {
         notifyHeight();
         setTimeout(notifyHeight, 300);
         setTimeout(notifyHeight, 1000);
+        setTimeout(function() {
+          if (!document.querySelector('#widget iframe')) {
+            buildFallbackIframe();
+          }
+          notifyHeight();
+        }, 1600);
         setTimeout(notifyHeight, 2500);
       });
     </script>
